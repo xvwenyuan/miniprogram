@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 创建实例时设置配置的默认值
 
-const baseUrl = 'http://localhost:3000'
+const baseUrl = 'http://192.168.0.105:3000'
 
 axios.defaults.timeout = 30000
 axios.defaults.baseURL = baseUrl

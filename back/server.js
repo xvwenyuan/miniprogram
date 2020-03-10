@@ -47,14 +47,11 @@ router.get('/hello/:name', async (ctx, next) => {
 router.get('/goods', async (ctx, next) => {
     try {
         let goodsList =  await findUserData();
-        console.log(goodsList);
-        // goodsList = JSON.parse(JSON.stringify(res))[0];
-        ctx.response.body = JSON.stringify(goodsList);
+        ctx.response.body = goodsList;
     } catch (error) {
         console.log('error')
     }
-    
-    
+   
 });
 
 // add url-route:
@@ -81,7 +78,7 @@ router.get('/login', async (ctx, next) => {
 // add router middleware:
 app.use(router.routes());
 
-app.listen(3000);//3000端口监听
+app.listen(3000,'192.168.0.105');//3000端口监听
 console.log('app started at port 3000...');
 data.data.forEach(item => {
     addUserData([item.goods_id, item.goods_name, item.group_price, item.hd_thumb_url, item.hd_url,item.good_points])

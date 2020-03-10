@@ -1,14 +1,14 @@
 {
   "pages": [
+    "pages/my/main",
     "pages/home/main",
     "pages/groupbuy/main",
     "pages/cart/main",
-    "pages/my/main",
     "pages/goodsdetail/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#fff",
+    "navigationBarBackgroundColor": "#fd0",
     "navigationBarTitleText": "WeChat",
     "navigationBarTextStyle": "black"
   },
