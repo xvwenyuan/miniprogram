@@ -1,10 +1,11 @@
 {
-  "pages": [
-    "pages/my/main",
+  "pages": [ 
     "pages/home/main",
     "pages/groupbuy/main",
     "pages/cart/main",
-    "pages/goodsdetail/main"
+    "pages/goodsdetail/main",
+    "pages/groupdetail/main",
+    "pages/my/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -1,6 +1,13 @@
 <template>
-  <div>gruoupbuy页面
-    <image src="http://t00img.yangkeduo.com/goods/images/2020-01-17/e1c28c6a7c97e8c72a4049289f2caea8.jpeg"/>
+  <div class="groupbuy">
+    <ul>
+      <li v-for="item in goodsList" :key="item.groupgoods_id" @click="goGroupDetail(item)">
+        <img :src="item.groupgoods_url" alt="">
+        <p class="desc">{{item.groupgoods_desc}}</p>
+        <p class="price">拼团价格:￥<span class="groupPrice">{{item.groupgoods_groupbuyprice/1000}}</span>&nbsp;<span class="originalPrice">原价:￥{{item.groupgoods_originalprice/1000}}</span></p>
+        <p class="sale">已拼{{item.groupgoods_sale}}件</p>
+      </li>
+    </ul>
   </div>
 </template>
 
@@ -9,12 +16,68 @@
 export default {
   data () {
     return {
-  
+      goodsList:[]
+    }
+  },
+  mounted(){
+  this.$http.get('/groupgoods').then(res => {
+    this.goodsList = res.data;
+    console.log(res.data)
+  }
+  )
+  },
+  methods:{
+    goGroupDetail(detailData){
+      wx.navigateTo({
+        url:'/pages/groupdetail/main?goodsData='+JSON.stringify(detailData)
+      })
     }
   }
 }
+
     
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+ul {
+  display: flex;
+  flex-wrap: wrap;
+  background-color: #f3f3f3;
+
+  li {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 24rpx;
+    margin: 10rpx 7.5rpx;
+    background-color: #fff;
+    img {
+      width: 300rpx;
+      height: 300rpx;
+    }
+    p.desc{
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    p.price{
+      span.groupPrice{
+        font-size: 30rpx;
+        color: #e3554c;
+        font-weight: bold;
+      }
+      span.originalPrice{
+        color: #9c9c9c;
+        text-decoration: line-through;
+      }
+    }
+    p.sale{
+      color:#555
+    }
+
+  }
+
+}
 </style>

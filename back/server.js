@@ -1,9 +1,10 @@
 const Koa = require('koa');//导入一个class
 const data = require('./data');
+const groupData = require('./groupData');
 // 注意require('koa-router')返回的是函数:
 const router = require('koa-router')();
 const bodyParser = require('koa-bodyparser');
-const { findUserData, addUserData } = require('./mysql');
+const { findUserData, addUserData,addGroupGoods } = require('./mysql');
 const axios = require('axios');
 var cors = require('koa2-cors');
 const app = new Koa();//创建一个koa对象
@@ -46,12 +47,19 @@ router.get('/hello/:name', async (ctx, next) => {
 // });
 router.get('/goods', async (ctx, next) => {
     try {
-        let goodsList =  await findUserData();
+        let goodsList =  await findUserData('goods');
         ctx.response.body = goodsList;
     } catch (error) {
         console.log('error')
     }
-   
+});
+router.get('/groupgoods', async (ctx, next) => {
+    try {
+        let goodsList =  await findUserData('groupgoods');
+        ctx.response.body = goodsList;
+    } catch (error) {
+        console.log('error')
+    }
 });
 
 // add url-route:
@@ -81,5 +89,8 @@ app.use(router.routes());
 app.listen(3000,'192.168.0.105');//3000端口监听
 console.log('app started at port 3000...');
 data.data.forEach(item => {
-    addUserData([item.goods_id, item.goods_name, item.group_price, item.hd_thumb_url, item.hd_url,item.good_points])
-})
+    addUserData([item.goods_id, item.goods_name, item.group_price, item.hd_thumb_url, item.hd_url,item.short_name]);
+});
+groupData.goodsList.forEach(item => {
+    addGroupGoods([item.goodsId, item.goodsName, item.minGroupPrice, item.minGroupPrice*0.8, item.goodsImageUrl,item.goodsThumbnailUrl,item.goodsName,item.salesTip])
+});

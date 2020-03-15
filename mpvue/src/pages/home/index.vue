@@ -19,7 +19,7 @@
     <ul>
       <li v-for="data in goodsList" :key="data.goods_id" @click="goDetail(data)">
         <img :src="data.goods_url" />
-        <p>{{data.goods_name}}</p>
+        <p>{{data.goods_desc}}</p>
       </li>
     </ul>
     <!-- <ul>
@@ -85,8 +85,8 @@ ul {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 30rpx;
-    margin: 20rpx 7.5rpx;
+    font-size: 24rpx;
+    margin: 10rpx 7.5rpx;
     background-color: #fff;
     img {
       width: 300rpx;
