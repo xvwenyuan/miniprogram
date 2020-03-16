@@ -20,11 +20,16 @@ export default {
     }
   },
   mounted(){
-  this.$http.get('/groupgoods').then(res => {
+    this.$http.get('/groupgoods').then(res => {
     this.goodsList = res.data;
-    console.log(res.data)
   }
   )
+  },
+  onPullDownRefresh() {
+    this.$http.get("/groupgoods").then(res => {
+      this.goodsList = res.data;
+      wx.stopPullDownRefresh();
+    });
   },
   methods:{
     goGroupDetail(detailData){

@@ -32,41 +32,31 @@
 </template>
 
 <script>
-
 export default {
-  data () {
+  data() {
     return {
-      goodsList:[]
-    }
+      goodsList: []
+    };
   },
-  mounted () {
-    this.$http.get('/goods').then(res => {
-      this.goodsList = res.data;
-      console.log(res.data);
-      console.log(this.goodsList);
+  mounted() {
+    this.$http.get("/goods").then(res => {
+    this.goodsList = res.data;
     });
   },
-//  this.$http.get('/goods', 
-//     {
-//         headers: {
-//             'content-type': 'application/json'
-//         }
-//     }
-// ).then(res=>{
-//   this.goodsList = res.data;
-//   console.log(res.data)
-// })
-// },
-  methods:{
-    goDetail(detailData){
+  onPullDownRefresh() {
+    this.$http.get("/goods").then(res => {
+      this.goodsList = res.data;
+      wx.stopPullDownRefresh();
+    });
+  },
+  methods: {
+    goDetail(detailData) {
       wx.navigateTo({
-        url: '/pages/goodsdetail/main?goodsData='+ JSON.stringify(detailData)
+        url: "/pages/goodsdetail/main?goodsData=" + JSON.stringify(detailData)
       });
     }
   }
-}
-
-    
+};
 </script>
 
 <style scoped lang="scss">

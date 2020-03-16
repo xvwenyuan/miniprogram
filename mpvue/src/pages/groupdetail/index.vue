@@ -187,7 +187,7 @@ div.groupDetail {
         padding: 0;
         margin: 0;
         width: 50rpx;
-        height: 50rpx;
+        height: 7 0rpx;
         image {
           width: 50rpx;
           height: 50rpx;

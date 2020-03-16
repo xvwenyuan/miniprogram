@@ -44,21 +44,32 @@
     <div class="address">送至江西南昌蛟桥镇 ></div>
     <div class="address">送至江西南昌蛟桥镇 ></div>
     <div class="buy">
-      <div class="left">
+      <div class="left" @click="toHome">
         <img src="/static/goodsdetail/home.png" />
         <div>首页</div>
       </div>
-      <div class="right">
+      <div class="right" @click="toCart">
         <image src="/static/goodsdetail/cart.png" />
         <div>购物车</div>
       </div>
-      <div class="add">加入购物车</div>
+      <div class="add" @click="handleAddCart">加入购物车</div>
       <div class="imbuy">立即购买</div>
     </div>
   </div>
 </template>
 
 <script>
+/**
+加入购物车逻辑
+1.绑定点击事件
+2.事件里获取缓存中的的购物车数组(数组格式)
+3.判断数组中是否有当前商品对象
+4.若有则当前商品num++
+5.若无num为1,push加入数组中
+6.把数组放回缓存中
+7.弹出提示框
+
+ */
 export default {
   data() {
     return {
@@ -71,6 +82,39 @@ export default {
   computed: {
     price() {
       return (this.goodsData.goods_price / 100).toFixed(2);
+    }
+  },
+  methods: {
+    handleAddCart() {
+      let cart = wx.getStorageSync("cart") || [];
+      let index = cart.findIndex(v => v.goods_id === this.goodsData.goods_id);
+      if (index === -1) {
+        this.goodsData.num = 1;
+        this.goodsData.checked = true;
+        cart.push(this.goodsData);
+      } else {
+        cart[index].num++;
+      }
+      wx.setStorageSync("cart", cart);
+      wx.showToast({
+        title: "添加成功",
+        icon: "success",
+        duration: 1500,
+        mask: true, //防止用户疯狂点击
+        success: result => {},
+        fail: () => {},
+        complete: () => {}
+      });
+    },
+    toCart() {
+      wx.switchTab({
+        url: "../cart/main"
+      });
+    },
+    toHome() {
+      wx.switchTab({
+        url: "../home/main"
+      });
     }
   },
   onShareAppMessage() {
@@ -128,10 +172,10 @@ export default {
         margin: 0;
         width: 50rpx;
         height: 70rpx;
-          image{
-            width: 50rpx;
-            height: 50rpx;
-          }
+        image {
+          width: 50rpx;
+          height: 50rpx;
+        }
       }
       div {
         font-size: 24rpx;
@@ -174,7 +218,7 @@ export default {
     }
     .add {
       width: 35%;
-      background-color: #f40;
+      background-color: #f70;
       height: 100rpx;
       text-align: center;
       line-height: 100rpx;
