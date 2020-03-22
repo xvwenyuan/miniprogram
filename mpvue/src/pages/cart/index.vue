@@ -1,5 +1,10 @@
 <template>
   <div id="cartPage">
+    <div class="cartTop">
+      <div class="editCart" v-if="isEdit" @click="handleEdit">编辑</div>
+      <div class="editCart" v-else @click="handleEdit">完成</div>
+    </div>
+    <div class="fillTop"></div>
     <ul v-if="cartData.length!==0">
       <li class="goods" v-for="item in cartData" :key="item.goods_id">
         <checkbox-group :data-id="item.goods_id" @change="handleChange">
@@ -33,14 +38,16 @@
           <checkbox :checked="allChecked"></checkbox>
         </checkbox-group>
       </div>
-      <div class="sum">
+      <div class="sum" v-if="isEdit">
         <div class="header">
           合计：
           <span class="price">￥{{totalPrice}}</span>
         </div>
         <div class="footer">免运费</div>
       </div>
-      <div class="pay">结算({{totalNum}})</div>
+      <div class="sum" v-else></div>
+      <div class="pay" v-if="isEdit">结算({{totalNum}})</div>
+      <div class="pay" v-else @click="handleRemove">删除({{totalNum}})</div>
     </div>
   </div>
 </template>
@@ -52,7 +59,8 @@ export default {
       cartData: [],
       allChecked: true,
       totalPrice: 0,
-      totalNum: 0
+      totalNum: 0,
+      isEdit: true
     };
   },
   methods: {
@@ -111,9 +119,35 @@ export default {
       let cart = this.cartData;
       cart.forEach(v => (v.checked = this.allChecked));
       this.reCompute(cart);
+    },
+    handleEdit() {
+      this.isEdit = !this.isEdit;
+    },
+    handleRemove() {
+      let cart = this.cartData;
+      console.log("this获取的：", cart);
+      let arr = cart.filter(v => v.checked == true);
+      console.log("选中的要删除的：", arr);
+      cart = cart.filter(v => v.checked == false);
+      console.log("未选中的：", cart);
+      if (arr.length != 0) {
+        wx.showModal({
+          title: "提示",
+          content: "是否删除商品？",
+          success: res => {
+            if (res.confirm) {
+              this.reCompute(cart);
+              console.log("用户点击确定");
+            } else if (res.cancel) {
+              console.log("用户点击取消");
+            }
+          }
+        });
+      }
     }
   },
   onShow() {
+    this.isEdit = true;
     let totalPrice = 0;
     let totalNum = 0;
     let allChecked = true;
@@ -128,6 +162,25 @@ page {
   background-color: #f3f3f3;
 }
 div#cartPage {
+  div.cartTop {
+    position: fixed;
+    top: 0;
+    background-color: #fff;
+    width: 100%;
+    height: 50rpx;
+    border-bottom: 1rpx solid #ccc;
+    div.editCart {
+      font-size: 30rpx;
+      line-height: 50rpx;
+      height: 40rpx;
+      float: right;
+      margin-right: 60rpx;
+    }
+  }
+  div.fillTop {
+    width: 100%;
+    height: 50rpx;
+  }
   ul {
     li.goods {
       border-radius: 20rpx;
@@ -190,7 +243,7 @@ div#cartPage {
               background-color: #f3f3f3;
               text-align: center;
               border-radius: 50%;
-              line-height: 30rpx;
+              line-height: 35rpx;
               font-weight: bold;
             }
             div.goodsNum {
@@ -206,7 +259,7 @@ div#cartPage {
               background-color: #f3f3f3;
               text-align: center;
               border-radius: 50%;
-              line-height: 30rpx;
+              line-height: 35rpx;
               font-weight: bold;
             }
           }
@@ -214,10 +267,10 @@ div#cartPage {
       }
     }
   }
-  div.blank{
+  div.blank {
     font-weight: bold;
   }
-  div.fill{
+  div.fill {
     width: 100%;
     height: 100rpx;
   }
