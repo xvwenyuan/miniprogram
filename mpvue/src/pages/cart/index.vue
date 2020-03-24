@@ -29,7 +29,9 @@
         </div>
       </li>
     </ul>
-    <div v-else class="blank">购物车空空如也，还不赶快填满！！！！</div>
+    <div v-else class="blank">购物车空空如也，还不赶快填满！！！！
+      <image src="/static/others/spare.gif"/>
+    </div>
     <div class="fill"></div>
     <div class="total">
       <div class="all">
@@ -46,7 +48,7 @@
         <div class="footer">免运费</div>
       </div>
       <div class="sum" v-else></div>
-      <div class="pay" v-if="isEdit">结算({{totalNum}})</div>
+      <div class="pay" v-if="isEdit" @click="goPay">结算({{totalNum}})</div>
       <div class="pay" v-else @click="handleRemove">删除({{totalNum}})</div>
     </div>
   </div>
@@ -144,6 +146,26 @@ export default {
           }
         });
       }
+    },
+    goPay(){
+      if(!this.totalNum){
+        wx.showToast({
+          title: '你还没有选购商品',
+          icon: 'none',
+          image: '',
+          duration: 1500,
+          mask: false,
+          success: (result)=>{
+            
+          },
+          fail: ()=>{},
+          complete: ()=>{}
+        });
+        return 
+      }
+      wx.navigateTo({
+        url: '../pay/main',
+      });
     }
   },
   onShow() {
@@ -269,6 +291,9 @@ div#cartPage {
   }
   div.blank {
     font-weight: bold;
+    image{
+      width: 100%;
+    }
   }
   div.fill {
     width: 100%;

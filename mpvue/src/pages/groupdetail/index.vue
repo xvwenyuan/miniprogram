@@ -177,6 +177,7 @@ div.groupDetail {
       image {
         width: 50rpx;
         height: 50rpx;
+        margin: 10rpx 0 6rpx 0;
       }
     }
     div.share {
@@ -271,10 +272,7 @@ div.groupDetail {
         align-items: center;
         background-color: rgba(255, 0, 0, 0.5);
         border-radius: 20rpx 0 0 20rpx;
-        .singleTop {
-        }
-        .singleBottom {
-        }
+        
       }
       .startGroup {
         width: 50%;
@@ -284,10 +282,7 @@ div.groupDetail {
         align-items: center;
         background-color: #f00;
         border-radius: 0 20rpx 20rpx 0;
-        .groupTop {
-        }
-        .groupBottom {
-        }
+       
       }
     }
   }

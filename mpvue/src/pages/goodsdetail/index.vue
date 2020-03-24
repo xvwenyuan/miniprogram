@@ -7,8 +7,8 @@
     <div class="desc">
       <p class="goodsDesc">{{goodsData.goods_desc}}</p>
 
-      <div class="collect">
-        <image src="/static/groupdetail/collect.png" />
+      <div class="collect" @click="handleCollect">
+        <image :src="!isCollect?'/static/goodsdetail/collect.png':'/static/goodsdetail/collect-active.png'" />
         <div>收藏</div>
       </div>
       <div class="share">
@@ -19,30 +19,7 @@
         <div>分享</div>
       </div>
     </div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
+    <div class="address" @click='goEditAddress'>送至 {{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}} ></div>
     <div class="buy">
       <div class="left" @click="toHome">
         <img src="/static/goodsdetail/home.png" />
@@ -73,7 +50,10 @@
 export default {
   data() {
     return {
-      goodsData: {}
+      goodsData: {},
+      region: [],
+      detailAddress: "",
+      isCollect:false
     };
   },
   mounted() {
@@ -115,6 +95,15 @@ export default {
       wx.switchTab({
         url: "../home/main"
       });
+    },
+    goEditAddress(){
+      wx.navigateTo({
+        url: '../address/main'
+      });
+    },
+    handleCollect(){
+      let collect = wx.getStorageSync("collect")||[];
+
     }
   },
   onShareAppMessage() {
@@ -122,6 +111,13 @@ export default {
       title: this.goodsData.goods_name,
       path: "/pages/goodsdetail/main"
     };
+  },
+  onShow(){
+    // this.region = wx.getStorageSync("address")||[];
+    // this.detailAddress = wx.getStorageSync("detailAddress")||"";
+    // let collect = wx.getStorageSync("collect")||[];
+    // collect.findIndex()
+
   }
 };
 </script>
@@ -159,6 +155,7 @@ export default {
         font-size: 24rpx;
       }
       image {
+        margin: 10rpx 0 6rpx 0;
         width: 50rpx;
         height: 50rpx;
       }
@@ -184,10 +181,17 @@ export default {
     }
   }
   .address {
-    margin: 10rpx 0;
-    height: 40rpx;
+    margin: 10rpx 0 0 400rpx 0;
+    height: 50rpx;
     width: 100%;
     background-color: #fff;
+    padding: 4rpx;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    span{
+      float: right;
+    }
   }
   .buy {
     background-color: #fff;
