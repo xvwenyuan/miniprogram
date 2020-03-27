@@ -8,7 +8,8 @@
     "pages/my/main",
     "pages/address/main",
     "pages/pay/main",
-    "pages/order/main"
+    "pages/order/main",
+    "pages/paysuccess/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

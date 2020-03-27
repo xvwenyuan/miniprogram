@@ -71,7 +71,8 @@ ul {
   background-color: #f3f3f3;
 
   li {
-    width: 48%;
+    padding: 20rpx;
+    width: 43%;
     display: flex;
     flex-direction: column;
     align-items: center;

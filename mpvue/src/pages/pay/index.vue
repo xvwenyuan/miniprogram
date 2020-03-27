@@ -1,5 +1,6 @@
 <template>
-  <div id="pay">
+  <div id="pay" class="mask">
+    <div class="fillTop"></div>
     <div class="address">
       <div class="img">
         <image src="/static/others/address.png" />
@@ -20,11 +21,25 @@
           <div class="desc">{{item.goods_desc}}</div>
           <div class="numTool">
             <div class="price">￥{{item.goods_price/100}}</div>
-            <div class="goodsNum">X  {{item.num}}</div>
+            <div class="goodsNum">X {{item.num}}</div>
           </div>
         </div>
       </li>
     </ul>
+    <div class="picker" v-show="mask">
+      <div class="x" @click="cancelPay">X</div>
+      <div class="account">可期团购平台商户</div>
+      <div class="rmb">￥{{totalPrice}}</div>
+      <div class="method">
+        <div class="text">支付方式</div>
+        <div class="img">
+          <image src="/static/others/bill.png" />
+          <span class="bill">零钱></span>
+        </div>
+      </div>
+      <div class="comfirm" @click="comfirmPay">确认支付</div>
+    </div>
+    <div class="over" v-show="mask"></div>
     <div class="fill"></div>
     <div class="total">
       <div class="sum">
@@ -35,7 +50,7 @@
         <div class="footer">免运费</div>
       </div>
       <div class="sum"></div>
-      <div class="pay">支付({{totalNum}})</div>
+      <div class="pay" @click="payHandle">微信支付({{totalNum}})</div>
     </div>
   </div>
 </template>
@@ -50,30 +65,70 @@ export default {
       region: [],
       detailAddress: "",
       tel: "",
-      name: ""
+      name: "",
+      mask: false
     };
   },
-  methods:{
-    goAddressEdit(){
+  methods: {
+    goAddressEdit() {
       wx.navigateTo({
-        url: '../address/main'
+        url: "../address/main"
       });
+    },
+    payHandle() {
+      if (!this.detailAddress) {
+        wx.showToast({
+          title: "请先填写地址",
+          icon: "none",
+          image: "",
+          duration: 1500
+        });
+      } else {
+        wx.showToast({
+          title: "微信支付",
+          icon: "loading",
+          image: "",
+          duration: 800
+        });
+        setTimeout(() => {
+          this.mask = true;
+        }, 1000);
+      }
+    },
+    cancelPay() {
+      this.mask = false;
+    },
+    comfirmPay(){
+      wx.navigateTo(
+        {
+          url:"../paysuccess/main"
+        }
+      )
     }
   },
   onShow() {
     //购物车数据
     let cartData = wx.getStorageSync("cart") || [];
-    console.log(wx.getStorageSync("cart") || [])
+    let cutData = wx.getStorageSync("cart") || [];
     let totalNum = 0;
     let totalPrice = 0;
     cartData = cartData.filter(v => v.checked);
     this.cartData = cartData;
+    this.cartData.forEach(v => {
+      v.orderNo = parseInt(
+        new Date().getTime() + Math.random() * 100000 * (Math.random() * 100000)
+      );
+      console.log(v.orderNo);
+    });
     cartData.forEach(v => {
       totalNum += v.num;
       totalPrice += v.goods_price / 100.0 * v.num;
     });
-    this.totalPrice = totalPrice;
+    this.totalPrice = totalPrice.toFixed(2);
     this.totalNum = totalNum;
+    //移除购物车的要生成订单的数据
+    cutData = cutData.filter(v => v.checked == false);
+    wx.setStorageSync("cart", cutData);
     //地址数据
     let addressData = wx.getStorageSync("address") || [];
     let detailAddressData = wx.getStorageSync("detailAddress") || "";
@@ -92,10 +147,18 @@ page {
   width: 100%;
   height: 100%;
   background-color: #f3f3f3;
+  padding: 0;
+  margin: 0;
   #pay {
+    width: 100%;
+    height: 100%;
+    div.fillTop {
+      width: 100%;
+      height: 20rpx;
+    }
     .address {
       background-color: #fff;
-      margin: 20rpx;
+      margin: 0 20rpx 20rpx 20rpx;
       border-radius: 20rpx;
       display: flex;
       .img {
@@ -113,8 +176,6 @@ page {
         .top {
           display: flex;
           margin-bottom: 10rpx;
-          .name {
-          }
           .tel {
             font-size: 28rpx;
             color: #333;
@@ -126,7 +187,7 @@ page {
           font-size: 30rpx;
         }
       }
-      .getAddress{
+      .getAddress {
         flex: 5;
         height: 160rpx;
         line-height: 160rpx;
@@ -180,11 +241,85 @@ page {
       }
     }
   }
-  div.blank {
-    font-weight: bold;
-    image {
-      width: 100%;
+  .picker {
+    position: fixed;
+    z-index: 101;
+    margin: auto;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20rpx;
+    width: 600rpx;
+    height: 600rpx;
+    background-color: #fff;
+    border-radius: 20rpx;
+    .x {
+      color: #ccc;
+      text-align: left;
+      margin: 10rpx 0 10rpx 10rpx;
+      font-size: 40rpx;
     }
+    .account {
+      text-align: center;
+      margin: 30rpx 0;
+      font-size: 36rpx;
+      font-weight: 400;
+    }
+    .rmb {
+      text-align: center;
+      font-size: 50rpx;
+      font-weight: 800;
+      margin: 30rpx 0;
+      padding: 20rpx 0;
+    }
+    .method {
+      display: flex;
+      margin: 30rpx 0;
+      justify-content: space-between;
+      padding-top: 20rpx;
+      border-top: 1rpx solid #eee;
+      line-height: 54rpx;
+      height: 54rpx;
+      .text {
+        font-size: 30rpx;
+        color: #444;
+      }
+      .img {
+        display: flex;
+        justify-content: right;
+        image {
+          width: 40rpx;
+          height: 40rpx;
+          margin-top: 7rpx;
+          margin-right: 4rpx;
+        }
+        span.bill {
+          font-size: 32rpx;
+        }
+      }
+    }
+    .comfirm {
+      width: 300rpx;
+      height: 80rpx;
+      line-height: 80rpx;
+      background-color: #08c163;
+      text-align: center;
+      color: #fff;
+      border-radius: 10rpx;
+      padding: 10rpx;
+      margin: 50rpx auto;
+    }
+  }
+  .over {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: #000;
+    left: 0;
+    top: 0;
+    opacity: 0.7;
+    z-index: 100;
   }
   div.fill {
     width: 100%;
@@ -228,6 +363,7 @@ page {
       background-color: #f40;
       text-align: center;
       line-height: 100rpx;
+      color: #fff;
       font-weight: bold;
     }
   }

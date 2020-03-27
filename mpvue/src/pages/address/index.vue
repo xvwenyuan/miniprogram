@@ -17,7 +17,7 @@
       </div>
       <div class="detailAddress">
         <div class="detail_title">详细地址</div>
-        <input type="text" id="input" placeholder="街道门牌、楼层、房间号等详细信息等" v-model="detailAddress" />
+        <input type="text" id="input" placeholder="街道门牌、楼层、房间号等详细信息" v-model="detailAddress" />
       </div>
     </div>
     <button class="save" @click="saveAndReturn">保存并返回</button>

@@ -29,8 +29,9 @@
         </div>
       </li>
     </ul>
-    <div v-else class="blank">购物车空空如也，还不赶快填满！！！！
-      <image src="/static/others/spare.gif"/>
+    <div v-else class="blank">
+      购物车空空如也，还不赶快填满！！！！
+      <image src="/static/others/spare.gif" />
     </div>
     <div class="fill"></div>
     <div class="total">
@@ -147,25 +148,36 @@ export default {
         });
       }
     },
-    goPay(){
-      if(!this.totalNum){
+    goPay() {
+      if (!this.totalNum) {
         wx.showToast({
-          title: '你还没有选购商品',
-          icon: 'none',
-          image: '',
+          title: "你还没有选购商品",
+          icon: "none",
+          image: "",
           duration: 1500,
           mask: false,
-          success: (result)=>{
-            
-          },
-          fail: ()=>{},
-          complete: ()=>{}
+          success: result => {},
+          fail: () => {},
+          complete: () => {}
         });
-        return 
+        return;
       }
-      wx.navigateTo({
-        url: '../pay/main',
-      });
+      if (wx.getStorageSync("userInfo")) {
+        wx.navigateTo({
+          url: "../pay/main"
+        });
+      } else {
+        wx.showToast({
+          title: "请先登录",
+          icon: "success",
+          duration: 2000
+        });
+        setTimeout(() => {
+          wx.switchTab({
+            url: '../my/main'
+          });
+        }, 2000);
+      }
     }
   },
   onShow() {
@@ -291,7 +303,7 @@ div#cartPage {
   }
   div.blank {
     font-weight: bold;
-    image{
+    image {
       width: 100%;
     }
   }
@@ -357,6 +369,7 @@ div#cartPage {
       text-align: center;
       line-height: 100rpx;
       font-weight: bold;
+      color: #fff;
     }
   }
 }
