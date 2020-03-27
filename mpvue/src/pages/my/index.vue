@@ -2,7 +2,10 @@
   <div class="root">
     <div class="headers">
       <img :src="userInfo.avatarUrl?userInfo.avatarUrl:'/static/my/headimg.png'" />
-      <button open-type="getUserInfo" @getuserinfo="handleGetUserInfo">{{userInfo.nickName?userInfo.nickName:'登录'}}</button>
+      <button
+        open-type="getUserInfo"
+        @getuserinfo="handleGetUserInfo"
+      >{{userInfo.nickName?userInfo.nickName:'登录'}}</button>
     </div>
     <div class="content">
       <div class="order">
@@ -60,26 +63,50 @@
 export default {
   data() {
     return {
-      userInfo:{}
+      userInfo: {},
+      openId: ""
     };
   },
-  methods:{
-   handleGetUserInfo(res){
-     if(res.mp.detail.userInfo){
-       this.userInfo = res.mp.detail.userInfo
-     }
+  methods: {
+    handleGetUserInfo(res) {
+      if (res.mp.detail.userInfo) {
+        let userInfo = res.mp.detail.userInfo;
+        userInfo.openId = this.openId;
+        this.userInfo = userInfo;
+        wx.setStorageSync("userInfo", userInfo);
+        // this.$http.get(`/user?openId=${userInfo.openId}&nickName=${userInfo.nickname}&gender=${userInfo.gender}&city=${userInfo.city}`);
+        this.$http.post("/user", {
+            userInfo:userInfo.openId,
+            nickName:userInfo.nickName,
+            gender:userInfo.gender,
+            city:userInfo.city
+        });
+      }
     }
   },
-  mounted(){
-    wx.getUserInfo({
-      success:res=>{
-        //更新数据状态
-        this.userInfo = res.userInfo
-      },
-      fail:() => {
-        console.log("获取失败")
-      }
-    })
+  mounted() {
+    if (!this.openId) {
+      wx.login({
+        success: result => {
+          this.$http.get(`/login?jsCode=${result.code}`).then(res => {
+            this.openId = res.data;
+          });
+        }
+      });
+    }
+    this.userInfo = wx.getStorageSync("userInfo") || {};
+    // wx.getUserInfo({
+    //   success: res => {
+    //     //更新数据状态
+    //     let userInfo = res.data;
+    //     userInfo.openId = this.openId;
+    //     this.userInfo = userInfo;
+
+    //   },
+    //   fail: () => {
+    //     console.log("获取失败");
+    //   }
+    // });
   }
 };
 </script>

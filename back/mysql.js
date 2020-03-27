@@ -39,6 +39,10 @@ let allServices = {
      addGroupGoods: (obj) => {
         let _sql = "insert into groupgoods set groupgoods_id=?,groupgoods_desc=?,groupgoods_originalprice=?,groupgoods_groupbuyprice=?,groupgoods_url=?,groupgoods_detailurl=?,groupgoods_name=?,groupgoods_sale=?;"
         return allServices.query(_sql, obj)
+    },
+    addUser:(obj) => {
+        let _sql = "insert into user set open_id=?,nick_name=?,gender=?,city=?;"
+        return allServices.query(_sql, obj)
     }
 }
 

@@ -113,8 +113,8 @@ export default {
     };
   },
   onShow(){
-    // this.region = wx.getStorageSync("address")||[];
-    // this.detailAddress = wx.getStorageSync("detailAddress")||"";
+    this.region = wx.getStorageSync("address")||[];
+    this.detailAddress = wx.getStorageSync("detailAddress")||"";
     // let collect = wx.getStorageSync("collect")||[];
     // collect.findIndex()
 
@@ -155,14 +155,13 @@ export default {
         font-size: 24rpx;
       }
       image {
-        margin: 10rpx 0 6rpx 0;
+        margin: 10rpx 0 5rpx 0;
         width: 50rpx;
         height: 50rpx;
       }
     }
     div.share {
       margin: 0 20rpx;
-      color: #444;
       button[plain] {
         border: 0;
         padding: 0;

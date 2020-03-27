@@ -4,7 +4,7 @@ const groupData = require('./groupData');
 // 注意require('koa-router')返回的是函数:
 const router = require('koa-router')();
 const bodyParser = require('koa-bodyparser');
-const { findUserData, addUserData,addGroupGoods } = require('./mysql');
+const { findUserData, addUserData, addGroupGoods, addUser } = require('./mysql');
 const axios = require('axios');
 var cors = require('koa2-cors');
 const app = new Koa();//创建一个koa对象
@@ -47,7 +47,7 @@ router.get('/hello/:name', async (ctx, next) => {
 // });
 router.get('/goods', async (ctx, next) => {
     try {
-        let goodsList =  await findUserData('goods');
+        let goodsList = await findUserData('goods');
         ctx.response.body = goodsList;
     } catch (error) {
         console.log('error')
@@ -55,12 +55,41 @@ router.get('/goods', async (ctx, next) => {
 });
 router.get('/groupgoods', async (ctx, next) => {
     try {
-        let goodsList =  await findUserData('groupgoods');
+        let goodsList = await findUserData('groupgoods');
         ctx.response.body = goodsList;
     } catch (error) {
         console.log('error')
     }
 });
+// router.get('/user', async (ctx, next) => {
+
+//    try{
+//     let user = [
+//         ctx.query.openId,
+//         ctx.query.nickName,
+//         ctx.query.gender,
+//         ctx.query.city
+//        ]
+//     addUser(user);
+
+//     } catch (error){
+//         console.log('error')
+//     } 
+//     ctx.response.body = ""
+// });
+router.post('/user', async (ctx, next) => {
+    try {
+        let userData = ctx.request.body;
+        let userArray = [];
+        for(item in userData){
+            userArray.push(userData[item])
+        }
+        addUser(userArray);
+    } catch (error) { 
+        console.log(error)
+    }
+    ctx.response.body = ""
+})
 
 // add url-route:
 // router.post('/hello/:name', async (ctx, next) => {
@@ -71,6 +100,7 @@ router.get('/groupgoods', async (ctx, next) => {
 
 router.get('/login', async (ctx, next) => {
     var jsCode = ctx.query.jsCode;
+    console.log(jsCode)
     const res = await axios({
         method: 'get',
         url: 'https://api.weixin.qq.com/sns/jscode2session',
@@ -81,16 +111,16 @@ router.get('/login', async (ctx, next) => {
             grant_type: 'authorization_code'
         }
     })
-    ctx.response.body = `{code: 60000, openid: ${res.data.openid}}`;
+    ctx.response.body = res.data.openid;
 });
 // add router middleware:
 app.use(router.routes());
 
-app.listen(3000,'192.168.0.105');//3000端口监听
+app.listen(3000, '192.168.0.105');//3000端口监听
 console.log('app started at port 3000...');
-data.data.forEach(item => {
-    addUserData([item.goods_id, item.goods_name, item.group_price, item.hd_thumb_url, item.hd_url,item.short_name]);
-});
-groupData.goodsList.forEach(item => {
-    addGroupGoods([item.goodsId, item.goodsName, item.minGroupPrice, item.minGroupPrice*0.8, item.goodsImageUrl,item.goodsThumbnailUrl,item.goodsName,item.salesTip])
-});
+// data.data.forEach(item => {
+//     addUserData([item.goods_id, item.goods_name, item.group_price, item.hd_thumb_url, item.hd_url, item.short_name]);
+// });
+// groupData.goodsList.forEach(item => {
+//     addGroupGoods([item.goodsId, item.goodsName, item.minGroupPrice, item.minGroupPrice * 0.8, item.goodsImageUrl, item.goodsThumbnailUrl, item.goodsName, item.salesTip])
+// });

@@ -21,7 +21,9 @@
         <div>收藏</div>
       </div>
       <div class="share">
-        <button open-type="share" plain="true"><image src="/static/groupdetail/share.png" /></button>
+        <button open-type="share" plain="true">
+          <image src="/static/groupdetail/share.png" />
+        </button>
         <div>分享</div>
       </div>
     </div>
@@ -32,29 +34,6 @@
         <button>立即参团</button>
       </div>
     </div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
     <div class="address">送至江西南昌蛟桥镇 ></div>
 
     <div class="bottomBtn">
@@ -85,13 +64,12 @@ export default {
   },
   mounted() {
     this.goodsData = JSON.parse(this.$mp.query.goodsData);
-    console.log(this.goodsData);
   },
-  computed:{
-    originalPrice(){
+  computed: {
+    originalPrice() {
       return (this.goodsData.groupgoods_originalprice / 1000).toFixed(2);
     },
-    groupPrice(){
+    groupPrice() {
       return (this.goodsData.groupgoods_groupbuyprice / 1000).toFixed(2);
     }
   },
@@ -177,7 +155,7 @@ div.groupDetail {
       image {
         width: 50rpx;
         height: 50rpx;
-        margin: 10rpx 0 6rpx 0;
+        margin: 8rpx 0 3rpx 0;
       }
     }
     div.share {
@@ -188,7 +166,7 @@ div.groupDetail {
         padding: 0;
         margin: 0;
         width: 50rpx;
-        height: 7 0rpx;
+        height: 70rpx;
         image {
           width: 50rpx;
           height: 50rpx;
@@ -272,7 +250,6 @@ div.groupDetail {
         align-items: center;
         background-color: rgba(255, 0, 0, 0.5);
         border-radius: 20rpx 0 0 20rpx;
-        
       }
       .startGroup {
         width: 50%;
@@ -282,7 +259,6 @@ div.groupDetail {
         align-items: center;
         background-color: #f00;
         border-radius: 0 20rpx 20rpx 0;
-       
       }
     }
   }

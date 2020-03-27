@@ -15,5 +15,8 @@
     "koa-router": "^7.4.0",
     "koa2-cors": "^2.0.6",
     "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }

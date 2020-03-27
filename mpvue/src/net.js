@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // 创建实例时设置配置的默认值
 
 
@@ -14,8 +13,9 @@ axios.defaults.adapter = function (config) {
     mask: true
   })
   return new Promise((resolve, reject) => {
-    let data = config.method === 'get' ? config.params : qs.stringify(config.data)
+    let data = config.method === 'get' ? config.params : config.data
     // wx小程序 发起请求相应 log 就可以看到熟悉的返回啦
+    // console.log(config)
     wx.request({
       url: config.baseURL + config.url,
       method: config.method,
