@@ -163,8 +163,10 @@ export default {
         return;
       }
       if (wx.getStorageSync("userInfo")) {
+        let selectGoods = this.cartData.filter(v => v.checked);
+        selectGoods.unshift({type:1});
         wx.navigateTo({
-          url: "../pay/main"
+          url: "../pay/main?payGoods="+JSON.stringify(selectGoods)
         });
       } else {
         wx.showToast({

@@ -37,16 +37,16 @@
     <div class="address">送至江西南昌蛟桥镇 ></div>
 
     <div class="bottomBtn">
-      <div class="home">
+      <div class="home" @click="toHome">
         <image src="/static/groupdetail/home.png" />
         <div>首页</div>
       </div>
-      <div class="twoBtn">
+      <div class="twoBtn" @click="toPayHandle">
         <div class="single">
           <div class="singleTop">￥{{originalPrice}}</div>
-          <div class="singleBottom">单独购买</div>
+          <div class="singleBottom" >单独购买</div>
         </div>
-        <div class="startGroup">
+        <div class="startGroup" @click="toPayHandleGroup">
           <div class="groupTop">￥{{groupPrice}}</div>
           <div class="groupBottom">我要开团</div>
         </div>
@@ -61,6 +61,29 @@ export default {
     return {
       goodsData: {}
     };
+  },
+  methods:{
+    toHome(){
+      wx.switchTab({
+        url: '../home/main'
+      });
+    },
+    toPayHandle() {
+      let goodsData = this.goodsData;
+      let goodsDataArray = [goodsData];
+      goodsDataArray.unshift({type:3});
+      wx.navigateTo({
+        url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
+      });
+    },
+     toPayHandleGroup() {
+      let goodsData = this.goodsData;
+      let goodsDataArray = [goodsData];
+      goodsDataArray.unshift({type:4});
+      wx.navigateTo({
+        url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
+      });
+    }
   },
   mounted() {
     this.goodsData = JSON.parse(this.$mp.query.goodsData);

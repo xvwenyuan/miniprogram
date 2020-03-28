@@ -3,13 +3,30 @@
     <icon class="sucIcon" type="success" size=30></icon>
     <div class="successText">支付成功</div>
     <div class="successAc">可期团购平台商户</div>
-    <div class="payMoney">￥49.90</div>
-    <div class="return">返回商家</div>
+    <div class="payMoney">￥{{totalPrice}}</div>
+    <div class="return" @click="returnHome">返回商家</div>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data(){
+    return{
+      totalPrice:0
+    }
+  },
+  methods:{
+    returnHome(){
+      wx.switchTab({
+        url: '../home/main'
+      });
+    }
+  },
+  mounted(){
+    this.totalPrice = JSON.parse(this.$mp.query.totalPrice).toFixed(2)
+    console.log(JSON.parse(this.$mp.query.totalPrice))
+  }
+};
 </script>
 
 <style lang="scss">

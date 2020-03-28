@@ -8,7 +8,9 @@
       <p class="goodsDesc">{{goodsData.goods_desc}}</p>
 
       <div class="collect" @click="handleCollect">
-        <image :src="!isCollect?'/static/goodsdetail/collect.png':'/static/goodsdetail/collect-active.png'" />
+        <image
+          :src="!isCollect?'/static/goodsdetail/collect.png':'/static/goodsdetail/collect-active.png'"
+        />
         <div>收藏</div>
       </div>
       <div class="share">
@@ -19,7 +21,10 @@
         <div>分享</div>
       </div>
     </div>
-    <div class="address" @click='goEditAddress'>送至 {{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}} ></div>
+    <div
+      class="address"
+      @click="goEditAddress"
+    >送至 {{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}} ></div>
     <div class="buy">
       <div class="left" @click="toHome">
         <img src="/static/goodsdetail/home.png" />
@@ -30,7 +35,7 @@
         <div>购物车</div>
       </div>
       <div class="add" @click="handleAddCart">加入购物车</div>
-      <div class="imbuy">立即购买</div>
+      <div class="imbuy" @click="toPayHandle">立即购买</div>
     </div>
   </div>
 </template>
@@ -53,7 +58,7 @@ export default {
       goodsData: {},
       region: [],
       detailAddress: "",
-      isCollect:false
+      isCollect: false
     };
   },
   mounted() {
@@ -96,14 +101,22 @@ export default {
         url: "../home/main"
       });
     },
-    goEditAddress(){
+    goEditAddress() {
       wx.navigateTo({
-        url: '../address/main'
+        url: "../address/main"
       });
     },
-    handleCollect(){
-      let collect = wx.getStorageSync("collect")||[];
+    // handleCollect(){
+    //   let collect = wx.getStorageSync("collect")||[];
 
+    // },
+    toPayHandle() {
+      let goodsData = this.goodsData;
+      let goodsDataArray = [goodsData];
+      goodsDataArray.unshift({type:2});
+      wx.navigateTo({
+        url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
+      });
     }
   },
   onShareAppMessage() {
@@ -112,12 +125,11 @@ export default {
       path: "/pages/goodsdetail/main"
     };
   },
-  onShow(){
-    this.region = wx.getStorageSync("address")||[];
-    this.detailAddress = wx.getStorageSync("detailAddress")||"";
+  onShow() {
+    this.region = wx.getStorageSync("address") || [];
+    this.detailAddress = wx.getStorageSync("detailAddress") || "";
     // let collect = wx.getStorageSync("collect")||[];
     // collect.findIndex()
-
   }
 };
 </script>
@@ -188,7 +200,7 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    span{
+    span {
       float: right;
     }
   }

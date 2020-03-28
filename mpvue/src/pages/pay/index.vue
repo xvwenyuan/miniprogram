@@ -14,14 +14,14 @@
       </div>
       <div class="getAddress" v-else @click="goAddressEdit">编辑地址</div>
     </div>
-    <ul v-if="cartData.length!==0">
-      <li class="goods" v-for="item in cartData" :key="item.goods_id">
+    <ul v-if="payGoods.length!=0">
+      <li class="goods" v-for="item in payGoods" :key="item.goods_id">
         <image class="img" :src="item.goods_url" />
         <div class="goodsInfo">
           <div class="desc">{{item.goods_desc}}</div>
           <div class="numTool">
-            <div class="price">￥{{item.goods_price/100}}</div>
-            <div class="goodsNum">X {{item.num}}</div>
+            <div class="price">￥{{item.goods_price}}</div>
+            <div class="goodsNum">X {{item.goods_num}}</div>
           </div>
         </div>
       </li>
@@ -59,14 +59,15 @@
 export default {
   data() {
     return {
-      cartData: [],
+      payGoods: [],
       totalNum: 0,
       totalPrice: 0,
       region: [],
       detailAddress: "",
       tel: "",
       name: "",
-      mask: false
+      mask: false,
+      order: {}
     };
   },
   methods: {
@@ -98,37 +99,96 @@ export default {
     cancelPay() {
       this.mask = false;
     },
-    comfirmPay(){
-      wx.navigateTo(
-        {
-          url:"../paysuccess/main"
-        }
-      )
+    comfirmPay() {
+      wx.navigateTo({
+        url: "../paysuccess/main?totalPrice=" + this.totalPrice
+      });
     }
   },
+  mounted() {},
   onShow() {
-    //购物车数据
-    let cartData = wx.getStorageSync("cart") || [];
-    let cutData = wx.getStorageSync("cart") || [];
+    this.mask = false;
     let totalNum = 0;
     let totalPrice = 0;
-    cartData = cartData.filter(v => v.checked);
-    this.cartData = cartData;
-    this.cartData.forEach(v => {
-      v.orderNo = parseInt(
-        new Date().getTime() + Math.random() * 100000 * (Math.random() * 100000)
-      );
-      console.log(v.orderNo);
-    });
-    cartData.forEach(v => {
-      totalNum += v.num;
-      totalPrice += v.goods_price / 100.0 * v.num;
-    });
-    this.totalPrice = totalPrice.toFixed(2);
+    let payGoodsData = JSON.parse(this.$mp.query.payGoods);
+    let computedData = [];
+    //type:1,2,3,4代表分别来自购物车、商品详情购买、团购单独购买、开团购买
+    if (payGoodsData[0].type === 1) {
+      payGoodsData.shift();
+      var cutCartData = [];
+      //移除购物车中被选中的数据
+      cutCartData = wx.getStorageSync("cart").filter(v => !v.checked);
+      wx.setStorageSync("cart", cutCartData);
+      console.log(payGoodsData);
+      payGoodsData.forEach(v => {
+        (totalNum += v.num), //求出总价和总数
+          (totalPrice += v.goods_price / 100 * v.num);
+      });
+      for (let i = 0; i < payGoodsData.length; i++) {
+        let ele = {
+          goods_id: payGoodsData[i].goods_id,
+          goods_name: payGoodsData[i].goods_name,
+          goods_num: payGoodsData[i].num,
+          goods_price: payGoodsData[i].goods_price / 100,
+          goods_url: payGoodsData[i].goods_url,
+          goods_desc: payGoodsData[i].goods_desc
+        };
+        computedData.push(ele);
+      }
+      console.log(computedData, totalNum, totalPrice);
+    } else if (payGoodsData[0].type === 2) {
+      payGoodsData.shift();
+      totalPrice = payGoodsData[0].goods_price / 100;
+      payGoodsData[0].num = 1;
+      totalNum = payGoodsData[0].num;
+      let ele = {
+        goods_id: payGoodsData[0].goods_id,
+        goods_name: payGoodsData[0].goods_name,
+        goods_num: payGoodsData[0].num,
+        goods_price: payGoodsData[0].goods_price / 100,
+        goods_url: payGoodsData[0].goods_url,
+        goods_desc: payGoodsData[0].goods_desc
+      };
+      computedData.push(ele);
+      console.log(computedData, totalNum, totalPrice);
+    } else if (payGoodsData[0].type === 3) {
+      payGoodsData.shift();
+      totalPrice = payGoodsData[0].groupgoods_originalprice / 1000;
+      payGoodsData[0].num = 1;
+      totalNum = payGoodsData[0].num;
+      let ele = {
+        goods_id: payGoodsData[0].groupgoods_id,
+        goods_name: payGoodsData[0].groupgoods_name,
+        goods_num: payGoodsData[0].num,
+        goods_price: payGoodsData[0].groupgoods_originalprice / 1000,
+        goods_url: payGoodsData[0].groupgoods_url,
+        goods_desc: payGoodsData[0].groupgoods_desc
+      };
+      computedData.push(ele);
+      console.log(computedData, totalNum, totalPrice);
+    } else if (payGoodsData[0].type === 4) {
+      payGoodsData.shift();
+      totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 1000;
+      payGoodsData[0].num = 1;
+      totalNum = payGoodsData[0].num;
+      let ele = {
+        goods_id: payGoodsData[0].groupgoods_id,
+        goods_name: payGoodsData[0].groupgoods_name,
+        goods_num: payGoodsData[0].num,
+        goods_price: payGoodsData[0].groupgoods_groupbuyprice / 1000,
+        goods_url: payGoodsData[0].groupgoods_url,
+        goods_dec: payGoodsData[0].groupgoods_desc
+      };
+      computedData.push(ele);
+      console.log(computedData, totalNum, totalPrice);
+    }
     this.totalNum = totalNum;
-    //移除购物车的要生成订单的数据
-    cutData = cutData.filter(v => v.checked == false);
-    wx.setStorageSync("cart", cutData);
+    this.totalPrice = totalPrice.toFixed(2);
+    this.payGoods = computedData;
+    console.log(this.payGoods)
+    // let orderNo = parseInt(new Date().getTime() + Math.random() * 100000 * (Math.random() * 100000));//生成随机订单号
+    // payGoods.push(orderNo);
+
     //地址数据
     let addressData = wx.getStorageSync("address") || [];
     let detailAddressData = wx.getStorageSync("detailAddress") || "";
