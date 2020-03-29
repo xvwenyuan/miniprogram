@@ -111,12 +111,25 @@ export default {
 
     // },
     toPayHandle() {
-      let goodsData = this.goodsData;
-      let goodsDataArray = [goodsData];
-      goodsDataArray.unshift({type:2});
-      wx.navigateTo({
-        url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
-      });
+      if (wx.getStorageSync("userInfo")) {
+        let goodsData = this.goodsData;
+        let goodsDataArray = [goodsData];
+        goodsDataArray.unshift({ type: 2 });
+        wx.navigateTo({
+          url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
+        });
+      } else {
+        wx.showToast({
+          title: "请先登录",
+          icon: "success",
+          duration: 2000
+        });
+        setTimeout(() => {
+          wx.switchTab({
+            url: "../my/main"
+          });
+        }, 2000);
+      }
     }
   },
   onShareAppMessage() {

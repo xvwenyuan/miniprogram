@@ -41,10 +41,10 @@
         <image src="/static/groupdetail/home.png" />
         <div>首页</div>
       </div>
-      <div class="twoBtn" @click="toPayHandle">
-        <div class="single">
+      <div class="twoBtn">
+        <div class="single" @click="toPayHandle">
           <div class="singleTop">￥{{originalPrice}}</div>
-          <div class="singleBottom" >单独购买</div>
+          <div class="singleBottom">单独购买</div>
         </div>
         <div class="startGroup" @click="toPayHandleGroup">
           <div class="groupTop">￥{{groupPrice}}</div>
@@ -62,27 +62,53 @@ export default {
       goodsData: {}
     };
   },
-  methods:{
-    toHome(){
+  methods: {
+    toHome() {
       wx.switchTab({
-        url: '../home/main'
+        url: "../home/main"
       });
     },
     toPayHandle() {
-      let goodsData = this.goodsData;
-      let goodsDataArray = [goodsData];
-      goodsDataArray.unshift({type:3});
-      wx.navigateTo({
-        url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
-      });
+      if (wx.getStorageSync("userInfo")) {
+        let goodsData = this.goodsData;
+        let goodsDataArray = [goodsData];
+        goodsDataArray.unshift({ type: 3 });
+        wx.navigateTo({
+          url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
+        });
+      } else {
+        wx.showToast({
+          title: "请先登录",
+          icon: "success",
+          duration: 2000
+        });
+        setTimeout(() => {
+          wx.switchTab({
+            url: "../my/main"
+          });
+        }, 2000);
+      }
     },
-     toPayHandleGroup() {
-      let goodsData = this.goodsData;
-      let goodsDataArray = [goodsData];
-      goodsDataArray.unshift({type:4});
-      wx.navigateTo({
-        url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
-      });
+    toPayHandleGroup() {
+      if (wx.getStorageSync("userInfo")) {
+        let goodsData = this.goodsData;
+        let goodsDataArray = [goodsData];
+        goodsDataArray.unshift({ type: 4 });
+        wx.navigateTo({
+          url: "../pay/main?payGoods=" + JSON.stringify(goodsDataArray)
+        });
+      } else {
+        wx.showToast({
+          title: "请先登录",
+          icon: "success",
+          duration: 2000
+        });
+        setTimeout(() => {
+          wx.switchTab({
+            url: "../my/main"
+          });
+        }, 2000);
+      }
     }
   },
   mounted() {
@@ -139,7 +165,7 @@ div.groupDetail {
           font-size: 20rpx;
           border: 1px solid #fff;
           display: inline-block;
-          line-height: normal;
+          line-height: 30rpx;
           height: 30rpx;
           border-radius: 5rpx;
           margin: 0 20rpx;

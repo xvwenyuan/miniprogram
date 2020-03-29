@@ -62,6 +62,7 @@ export default {
       payGoods: [],
       totalNum: 0,
       totalPrice: 0,
+      group: false,
       region: [],
       detailAddress: "",
       tel: "",
@@ -100,12 +101,19 @@ export default {
       this.mask = false;
     },
     comfirmPay() {
-      wx.navigateTo({
-        url: "../paysuccess/main?totalPrice=" + this.totalPrice
-      });
+      if (this.group) {
+        wx.reLaunch({
+          url:
+            "../paysuccess/main?totalPrice=" + this.totalPrice + "&group=true"
+        });
+      } else {
+        wx.reLaunch({
+          url:
+            "../paysuccess/main?totalPrice=" + this.totalPrice + "&group=false"
+        });
+      }
     }
   },
-  mounted() {},
   onShow() {
     this.mask = false;
     let totalNum = 0;
@@ -114,6 +122,7 @@ export default {
     let computedData = [];
     //type:1,2,3,4代表分别来自购物车、商品详情购买、团购单独购买、开团购买
     if (payGoodsData[0].type === 1) {
+      this.group = false;
       payGoodsData.shift();
       var cutCartData = [];
       //移除购物车中被选中的数据
@@ -135,8 +144,8 @@ export default {
         };
         computedData.push(ele);
       }
-      console.log(computedData, totalNum, totalPrice);
     } else if (payGoodsData[0].type === 2) {
+      this.group = false;
       payGoodsData.shift();
       totalPrice = payGoodsData[0].goods_price / 100;
       payGoodsData[0].num = 1;
@@ -150,8 +159,8 @@ export default {
         goods_desc: payGoodsData[0].goods_desc
       };
       computedData.push(ele);
-      console.log(computedData, totalNum, totalPrice);
     } else if (payGoodsData[0].type === 3) {
+      this.group = false;
       payGoodsData.shift();
       totalPrice = payGoodsData[0].groupgoods_originalprice / 1000;
       payGoodsData[0].num = 1;
@@ -165,8 +174,8 @@ export default {
         goods_desc: payGoodsData[0].groupgoods_desc
       };
       computedData.push(ele);
-      console.log(computedData, totalNum, totalPrice);
     } else if (payGoodsData[0].type === 4) {
+      this.group = true;
       payGoodsData.shift();
       totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 1000;
       payGoodsData[0].num = 1;
@@ -180,12 +189,10 @@ export default {
         goods_dec: payGoodsData[0].groupgoods_desc
       };
       computedData.push(ele);
-      console.log(computedData, totalNum, totalPrice);
     }
     this.totalNum = totalNum;
     this.totalPrice = totalPrice.toFixed(2);
     this.payGoods = computedData;
-    console.log(this.payGoods)
     // let orderNo = parseInt(new Date().getTime() + Math.random() * 100000 * (Math.random() * 100000));//生成随机订单号
     // payGoods.push(orderNo);
 

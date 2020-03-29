@@ -1,30 +1,43 @@
 <template>
   <div id="paySuccess">
-    <icon class="sucIcon" type="success" size=30></icon>
+    <icon class="sucIcon" type="success" size="30"></icon>
     <div class="successText">支付成功</div>
     <div class="successAc">可期团购平台商户</div>
     <div class="payMoney">￥{{totalPrice}}</div>
-    <div class="return" @click="returnHome">返回商家</div>
+    <div class="return" @click="returnHome" v-if="!group">返回商家</div>
+    <div class="invite" @click="returnGroup" v-else>邀请好友拼团</div>
   </div>
 </template>
 
 <script>
 export default {
-  data(){
-    return{
-      totalPrice:0
-    }
+  data() {
+    return {
+      totalPrice: 0,
+      group: false
+    };
   },
-  methods:{
-    returnHome(){
+  methods: {
+    returnHome() {
       wx.switchTab({
-        url: '../home/main'
+        url: "../home/main"
+      });
+    },
+    returnGroup() {
+      wx.navigateTo({
+        url: "../assemble/main"
       });
     }
   },
-  mounted(){
-    this.totalPrice = JSON.parse(this.$mp.query.totalPrice).toFixed(2)
-    console.log(JSON.parse(this.$mp.query.totalPrice))
+  onShow() {
+    this.totalPrice = JSON.parse(this.$mp.query.totalPrice);
+    let flag = this.$mp.query.group;
+    console.log(flag)
+    if (flag === 'true') {
+      this.group = true;
+    } else {
+      this.group = false;
+    }
   }
 };
 </script>
@@ -72,6 +85,18 @@ page {
       line-height: 100rpx;
       height: 100rpx;
       background-color: #eee;
+      font-weight: bold;
+      border-radius: 10rpx;
+    }
+    div.invite {
+      position: absolute;
+      bottom: 10rpx;
+      color: #fff;
+      width: 400rpx;
+      text-align: center;
+      line-height: 100rpx;
+      height: 100rpx;
+      background-color: #f00;
       font-weight: bold;
       border-radius: 10rpx;
     }
