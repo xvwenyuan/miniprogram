@@ -27,22 +27,35 @@ let allServices = {
         })
 
     },
-   findUserData: function (tableName) {
+   findUserData: function (tableName) {//查询商品
         // let _sql = `select * from user where username="${name}";`
         let _sql = `select * from ${tableName};`
         return allServices.query(_sql)
     },
-    addUserData: (obj) => {
+    addUserData: (obj) => {//插入普通商品
          let _sql = "insert into goods set goods_id=?,goods_desc=?,goods_price=?,goods_url=?,goods_detailurl=?,goods_name=?;"
          return allServices.query(_sql, obj)
      },
-     addGroupGoods: (obj) => {
+     addGroupGoods: (obj) => {//插入团购商品
         let _sql = "insert into groupgoods set groupgoods_id=?,groupgoods_desc=?,groupgoods_originalprice=?,groupgoods_groupbuyprice=?,groupgoods_url=?,groupgoods_detailurl=?,groupgoods_name=?,groupgoods_sale=?;"
         return allServices.query(_sql, obj)
     },
-    addUser:(obj) => {
-        let _sql = "insert into user set open_id=?,nick_name=?,gender=?,city=?;"
+    addUser:(obj) => {//插入用户
+        let _sql = "insert into user set open_id=?,nick_name=?,image=?,gender=?,city=?,province=?;"
         return allServices.query(_sql, obj)
+    },
+    addAcivity:(obj) => {//团购活动数据
+        let _sql = "insert into groupbuyactivity set act_no=?,open_id=?,goods_id=?,captain=?,date=?;"
+        return allServices.query(_sql, obj)
+    },
+    getGroupSet:(obj) =>{//获取团购设置
+        let _sql = "select * from groupbuyset";
+        return allServices.query(_sql, obj)
+    },
+    getGroupInfo:(obj) => {
+        let _sql = "select open_id,nick_name,image,captain,groupgoods_desc,groupgoods_originalprice,groupgoods_groupbuyprice,groupgoods_url from groupbuyactivity,user,groupgoods where groupbuyactivity.open_id = user.open_id and groupbuyactivity.goods_id = groupgoods.groupgoods_id and groupbuyactivity.act_no ="+obj
+        return allServices.query(_sql, obj)
+
     }
 }
 

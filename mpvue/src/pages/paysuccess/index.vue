@@ -5,7 +5,7 @@
     <div class="successAc">可期团购平台商户</div>
     <div class="payMoney">￥{{totalPrice}}</div>
     <div class="return" @click="returnHome" v-if="!group">返回商家</div>
-    <div class="invite" @click="returnGroup" v-else>邀请好友拼团</div>
+    <!-- <div class="invite" @click="returnGroup" v-else>邀请好友拼团</div> -->
   </div>
 </template>
 
@@ -32,9 +32,18 @@ export default {
   onShow() {
     this.totalPrice = JSON.parse(this.$mp.query.totalPrice);
     let flag = this.$mp.query.group;
-    console.log(flag)
-    if (flag === 'true') {
+    let actId = this.$mp.query.actId;
+    if (flag === "true") {
       this.group = true;
+      wx.showToast({
+        title: "正在前往拼团页面",
+        icon: "none",
+        image: "",
+        mask: true
+      });
+      wx.reLaunch({
+        url: "../assemble/main?actId="+actId
+      });
     } else {
       this.group = false;
     }
@@ -88,18 +97,18 @@ page {
       font-weight: bold;
       border-radius: 10rpx;
     }
-    div.invite {
-      position: absolute;
-      bottom: 10rpx;
-      color: #fff;
-      width: 400rpx;
-      text-align: center;
-      line-height: 100rpx;
-      height: 100rpx;
-      background-color: #f00;
-      font-weight: bold;
-      border-radius: 10rpx;
-    }
+    // div.invite {
+    //   position: absolute;
+    //   bottom: 10rpx;
+    //   color: #fff;
+    //   width: 400rpx;
+    //   text-align: center;
+    //   line-height: 100rpx;
+    //   height: 100rpx;
+    //   background-color: #f00;
+    //   font-weight: bold;
+    //   border-radius: 10rpx;
+    // }
   }
 }
 </style>

@@ -78,8 +78,10 @@ export default {
         this.$http.post("/user", {
             userInfo:userInfo.openId,
             nickName:userInfo.nickName,
+            image:userInfo.avatarUrl,
             gender:userInfo.gender,
-            city:userInfo.city
+            city:userInfo.city,
+            province:userInfo.province
         });
       }
     }

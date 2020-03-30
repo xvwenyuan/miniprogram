@@ -16,11 +16,15 @@
         </div>
       </div>
       <div class="user">
-        <div class="userName">萤火虫吃蜗牛发现的好东西，快来参加拼团吧</div>
+        <div class="userName">
+          <span class="name">萤火虫吃蜗牛</span>发现的好东西,快来参加拼团吧！
+        </div>
         <div class="time">
-          <span>还差1人</span>
-          <span>距结束</span>
-          <span>08:28:16</span>
+          <span class="text1">还差</span>
+          <span class="text2">{{person}}</span>
+          <span class="text3">人</span>
+          <span class="text4">距结束</span>
+          <span class="text5">08:28:16</span>
         </div>
         <div class="radius">
           <div class="userGroup">
@@ -39,7 +43,7 @@
           <div class="userGroup"></div>
         </div>
       </div>
-      <button class="inviteFriend">邀请好友</button>
+      <button class="inviteFriend" open-type="share">邀请好友</button>
       <!-- <button class="payGroup">支付￥18.88元参与拼团</button> -->
     </div>
     <div class="process">
@@ -72,7 +76,45 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      person: 0,
+      time: 0,
+      actId: 0,
+      info: {},
+      myOpenId: "",
+      captainArray: [],
+      memberArray: []
+    };
+  },
+  onShareAppMessage() {
+    return {
+      title: "好友邀请快来拼团",
+      path: "/pages/assemble/main"
+    };
+  },
+  onShow() {
+    this.myOpenId = wx.getStorageSync("userinfo").openId||"";
+    console.log(this.myOpenId);
+    this.actId = this.$mp.query.actId;
+    console.log(this.actId);
+    this.$http.get("/groupset").then(res => {
+      this.person = res.data[0].person;
+      this.time = res.data[0].time;
+    });
+    this.$http
+      .post("/groupInfo", {
+        actNo: this.actId
+      })
+      .then(res => {
+        this.info = res.data;
+      });
+      this.captainArray = this.info.filter(v => v.captain);
+      this.memberArray = this.info.filter(v => !v.captain);
+  }
+  
+};
 </script>
 
 <style lang="scss">
@@ -134,10 +176,29 @@ page {
       }
       div.user {
         div.userName {
+          font-size: 30rpx;
+          margin: 10rpx;
+          span.name {
+          }
         }
 
         div.time {
-          span {
+          font-size: 28rpx;
+          display: flex;
+          justify-content: center;
+          .text1 {
+          }
+          .text2 {
+            color: #f00;
+          }
+          .text3 {
+            margin-right: 30rpx;
+          }
+          .text4 {
+            margin-right: 20rpx;
+          }
+          .text5 {
+            color: #f00;
           }
         }
         div.radius {

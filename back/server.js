@@ -4,7 +4,7 @@ const groupData = require('./groupData');
 // 注意require('koa-router')返回的是函数:
 const router = require('koa-router')();
 const bodyParser = require('koa-bodyparser');
-const { findUserData, addUserData, addGroupGoods, addUser } = require('./mysql');
+const { findUserData, addUserData, addGroupGoods, addUser, addAcivity, getGroupSet,getGroupInfo } = require('./mysql');
 const axios = require('axios');
 var cors = require('koa2-cors');
 const app = new Koa();//创建一个koa对象
@@ -26,26 +26,26 @@ app.use(async (ctx, next) => {
 });
 
 // add url-route:
-router.get('/hello/:name', async (ctx, next) => {
-    var name = ctx.params.name;
-    try {
-        let res = await findUserData(name);
-        // res = await Promise.all([findUserData(name), addUserData(name)])
-        res = JSON.parse(JSON.stringify(res))[0];
-        // ctx.response.body = `<h1>email, ${res.email}!</h1><h1>registerdate, ${res.registerdate}!</h1>`;
-        ctx.response.body = JSON.stringify(res);
-    } catch{
+// router.get('/hello/:name', async (ctx, next) => {
+//     var name = ctx.params.name;
+//     try {
+//         let res = await findUserData(name);
+//         // res = await Promise.all([findUserData(name), addUserData(name)])
+//         res = JSON.parse(JSON.stringify(res))[0];
+//         // ctx.response.body = `<h1>email, ${res.email}!</h1><h1>registerdate, ${res.registerdate}!</h1>`;
+//         ctx.response.body = JSON.stringify(res);
+//     } catch{
 
-    }
+//     }
 
-});
+// });
 
 // add url-route:
 // router.get('/json', async (ctx, next) => {
 //     const json = { 1: 2, 3: 4 };
 //     ctx.response.body = JSON.stringify(json);
 // });
-router.get('/goods', async (ctx, next) => {
+router.get('/goods', async (ctx, next) => {//获取普通商品
     try {
         let goodsList = await findUserData('goods');
         ctx.response.body = goodsList;
@@ -53,7 +53,7 @@ router.get('/goods', async (ctx, next) => {
         console.log('error')
     }
 });
-router.get('/groupgoods', async (ctx, next) => {
+router.get('/groupgoods', async (ctx, next) => {//获取团购商品
     try {
         let goodsList = await findUserData('groupgoods');
         ctx.response.body = goodsList;
@@ -77,20 +77,45 @@ router.get('/groupgoods', async (ctx, next) => {
 //     } 
 //     ctx.response.body = ""
 // });
-router.post('/user', async (ctx, next) => {
+router.post('/user', async (ctx, next) => {//存储用户数据
     try {
         let userData = ctx.request.body;
         let userArray = [];
-        for(item in userData){
+        for (item in userData) {
             userArray.push(userData[item])
         }
         addUser(userArray);
-    } catch (error) { 
+    } catch (error) {
         console.log(error)
     }
     ctx.response.body = ""
 })
-
+router.post('/activity', async (ctx, next) => {//存储团购活动数据
+    try {
+        let actData = ctx.request.body.activity;
+        let actArray = [];
+        for (item in actData) {
+            actArray.push(actData[item])
+        }
+        console.log(actArray)
+        addAcivity(actArray);
+    } catch (error) {
+        console.log(error)
+    }
+    ctx.response.body = ""
+})
+router.get('/groupset', async (ctx, next) => {//发送团购设置,人数、时间等.
+    try {
+        let setData = await getGroupSet();
+        ctx.response.body = setData;
+    } catch (error) {
+        console.log('error')
+    }
+})
+router.post('/groupInfo',async (ctx,next) => {//发送团购数据信息
+    let actNo = ctx.request.body.actNo;
+    ctx.response.body =await getGroupInfo(actNo)
+})
 // add url-route:
 // router.post('/hello/:name', async (ctx, next) => {
 //     var name = ctx.params.name;
@@ -98,7 +123,7 @@ router.post('/user', async (ctx, next) => {
 //     ctx.response.body = `<h1>Hello, ${name}!</h1><h1>Hello, ${hello}!</h1>`;
 // });
 
-router.get('/login', async (ctx, next) => {
+router.get('/login', async (ctx, next) => {//获取openid标识用户身份
     var jsCode = ctx.query.jsCode;
     console.log(jsCode)
     const res = await axios({

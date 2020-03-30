@@ -68,7 +68,9 @@ export default {
       tel: "",
       name: "",
       mask: false,
-      order: {}
+      groupBuyAct: {},
+      captain: 0,
+      actId:0
     };
   },
   methods: {
@@ -86,32 +88,70 @@ export default {
           duration: 1500
         });
       } else {
-        wx.showToast({
-          title: "微信支付",
-          icon: "loading",
-          image: "",
-          duration: 800
-        });
-        setTimeout(() => {
-          this.mask = true;
-        }, 1000);
+        this.mask = true;
       }
     },
     cancelPay() {
       this.mask = false;
     },
-    comfirmPay() {
-      if (this.group) {
-        wx.reLaunch({
-          url:
-            "../paysuccess/main?totalPrice=" + this.totalPrice + "&group=true"
-        });
-      } else {
-        wx.reLaunch({
-          url:
-            "../paysuccess/main?totalPrice=" + this.totalPrice + "&group=false"
-        });
-      }
+    async comfirmPay() {
+      this.groupBuyAct.date = this.getTimeNow();
+      let activity = this.groupBuyAct;
+      console.log(this.groupBuyAct);
+      await this.$http.post("/activity", {
+        activity
+      });
+      wx.showToast({
+        title: "正在支付",
+        icon: "loading",
+        image: "",
+        duration: 1800
+      });
+      setTimeout(() => {
+        if (this.group) {
+          wx.reLaunch({
+            url:
+              "../paysuccess/main?totalPrice=" + this.totalPrice + "&group=true&actId=" + this.actId
+          });
+        } else {
+          wx.reLaunch({
+            url:
+              "../paysuccess/main?totalPrice=" +
+              this.totalPrice +
+              "&group=false"
+          });
+        }
+      }, 2000);
+    },
+    getTimeNow() {
+      let now = new Date();
+      let year = now.getFullYear(); //得到年份
+      let month = now.getMonth(); //得到月份
+      var date = now.getDate(); //得到日期
+      let hour = now.getHours(); //得到小时
+      let minu = now.getMinutes(); //得到分钟
+      let sec = now.getSeconds(); //得到秒
+      let time = "";
+      month = month + 1;
+      if (month < 10) month = "0" + month;
+      if (date < 10) date = "0" + date;
+      if (hour < 10) hour = "0" + hour;
+      if (minu < 10) minu = "0" + minu;
+      if (sec < 10) sec = "0" + sec;
+      time =
+        year +
+        "年" +
+        month +
+        "月" +
+        date +
+        "日" +
+        " " +
+        hour +
+        ":" +
+        minu +
+        ":" +
+        sec;
+      return time;
     }
   },
   onShow() {
@@ -119,7 +159,15 @@ export default {
     let totalNum = 0;
     let totalPrice = 0;
     let payGoodsData = JSON.parse(this.$mp.query.payGoods);
+    console.log();
     let computedData = [];
+    //ordeNo订单号,openId:用户,goodsId:商品ID,goodsNum:商品数量,goodsPrice:商品价格,
+    //date:下单时间,orderStatus:订单状态1待收货,2待付款,goodsType:商品类型,0普通商品,1团购商品
+
+    let actId = parseInt(
+      new Date().getTime() + Math.random() * 100000 * (Math.random() * 100000)
+    ); //生成随机订单号
+    let openId = wx.getStorageSync("userInfo").openId;
     //type:1,2,3,4代表分别来自购物车、商品详情购买、团购单独购买、开团购买
     if (payGoodsData[0].type === 1) {
       this.group = false;
@@ -128,7 +176,6 @@ export default {
       //移除购物车中被选中的数据
       cutCartData = wx.getStorageSync("cart").filter(v => !v.checked);
       wx.setStorageSync("cart", cutCartData);
-      console.log(payGoodsData);
       payGoodsData.forEach(v => {
         (totalNum += v.num), //求出总价和总数
           (totalPrice += v.goods_price / 100 * v.num);
@@ -176,6 +223,7 @@ export default {
       computedData.push(ele);
     } else if (payGoodsData[0].type === 4) {
       this.group = true;
+      this.captain = 1;
       payGoodsData.shift();
       totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 1000;
       payGoodsData[0].num = 1;
@@ -189,11 +237,17 @@ export default {
         goods_dec: payGoodsData[0].groupgoods_desc
       };
       computedData.push(ele);
+      this.actId = actId;
+      this.groupBuyAct = {
+        actNo: actId,
+        openId: openId,
+        goodsId: payGoodsData[0].groupgoods_id,
+        captain: this.captain
+      };
     }
     this.totalNum = totalNum;
     this.totalPrice = totalPrice.toFixed(2);
     this.payGoods = computedData;
-    // let orderNo = parseInt(new Date().getTime() + Math.random() * 100000 * (Math.random() * 100000));//生成随机订单号
     // payGoods.push(orderNo);
 
     //地址数据
