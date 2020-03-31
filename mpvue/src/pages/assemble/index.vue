@@ -2,26 +2,23 @@
   <div id="assemble">
     <div class="body">
       <div class="goodsInfo">
-        <image
-          src="https://t00img.yangkeduo.com/goods/images/2019-10-27/4437d7ca146a39144b6a29c908ae20a4.jpeg"
-          class="img"
-        />
+        <image :src="captainArray.groupgoods_url" class="img" />
         <div class="desc">
           <div class="text">
-            <div class="descri">紫米面包550g黑米夹心奶酪整箱营养早餐手撕吐司蛋</div>
+            <div class="descri">{{captainArray.groupgoods_desc}}</div>
           </div>
-          <span class="peopleGroup">2人团</span>
-          <div class="origPrice">￥26.60</div>
-          <div class="price">￥22.00</div>
+          <span class="peopleGroup">{{person}}人团</span>
+          <div class="origPrice">￥{{oriPrice}}</div>
+          <div class="price">￥{{groupPrice}}</div>
         </div>
       </div>
       <div class="user">
         <div class="userName">
-          <span class="name">萤火虫吃蜗牛</span>发现的好东西,快来参加拼团吧！
+          <span class="name">{{captainArray.nick_name}}</span>发现的好东西,快来参加拼团吧！
         </div>
         <div class="time">
           <span class="text1">还差</span>
-          <span class="text2">{{person}}</span>
+          <span class="text2">{{needPerson}}</span>
           <span class="text3">人</span>
           <span class="text4">距结束</span>
           <span class="text5">08:28:16</span>
@@ -29,11 +26,9 @@
         <div class="radius">
           <div class="userGroup">
             <div class="user1">
-              <image
-                src="https://wx.qlogo.cn/mmopen/vi_32/iaM6NonIPzXyGh3ib5ste75WwP4vT1zJYYDK4oibmBhaTCyTapBselXBen42Lw8zXe0IP4gmhaLyQ5GRWv37htIZw/132"
-              />
+              <image :src="captainArray.image" />
               <div class="caption">团长</div>
-              <div class="nickName">萤火虫...</div>
+              <div class="nickName">{{captainArray.nick_name}}</div>
             </div>
             <div class="user2">
               <div class="invite">?</div>
@@ -43,8 +38,8 @@
           <div class="userGroup"></div>
         </div>
       </div>
-      <button class="inviteFriend" open-type="share">邀请好友</button>
-      <!-- <button class="payGroup">支付￥18.88元参与拼团</button> -->
+      <button class="inviteFriend" open-type="share" v-if="isMember">邀请好友</button>
+      <button class="payGroup" v-else>支付￥18.88元参与拼团</button>
     </div>
     <div class="process">
       <div class="content">
@@ -82,11 +77,24 @@ export default {
       person: 0,
       time: 0,
       actId: 0,
-      info: {},
+      info: [],
       myOpenId: "",
       captainArray: [],
-      memberArray: []
+      memberArray: [],
+      isMember:false,
+      memberNum:0
     };
+  },
+  computed:{
+    oriPrice(){
+      return (this.captainArray.groupgoods_originalprice/100).toFixed(2)
+    },
+    groupPrice(){
+      return (this.captainArray.groupgoods_groupbuyprice/100).toFixed(2)
+    },
+    needPerson(){ 
+      return this.person-this.memberNum
+    }
   },
   onShareAppMessage() {
     return {
@@ -94,8 +102,8 @@ export default {
       path: "/pages/assemble/main"
     };
   },
-  onShow() {
-    this.myOpenId = wx.getStorageSync("userinfo").openId||"";
+  async onShow() {
+    this.myOpenId = wx.getStorageSync("userInfo").openId || "";
     console.log(this.myOpenId);
     this.actId = this.$mp.query.actId;
     console.log(this.actId);
@@ -103,17 +111,32 @@ export default {
       this.person = res.data[0].person;
       this.time = res.data[0].time;
     });
-    this.$http
+    await this.$http
       .post("/groupInfo", {
         actNo: this.actId
       })
       .then(res => {
         this.info = res.data;
+        for (let prop in res.data) {
+          this.info.push(res.data[prop]);
+        }
+        let obj = {};
+        this.info.map(item => {//去重
+          obj[item.open_id] = item;
+        });
+        this.info = Object.values(obj);
       });
-      this.captainArray = this.info.filter(v => v.captain);
-      this.memberArray = this.info.filter(v => !v.captain);
+    this.memberNum = this.info.length;//团人数
+    this.captainArray = this.info.filter(v => v.captain)[0];//团长数组
+    this.memberArray = this.info.filter(v => !v.captain);//团员数组
+    console.log(this.myOpenId)
+    this.info.forEach( v => {
+      if( v.open_id === this.myOpenId){
+        this.isMember = true;
+      }
+    })
+    console.log(this.isMembe)    
   }
-  
 };
 </script>
 
@@ -231,6 +254,12 @@ page {
               }
               div.nickName {
                 font-size: 24rpx;
+                width: 100rpx;
+                height: 32rpx;
+                color: #000;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
             div.user2 {
@@ -252,7 +281,12 @@ page {
               }
               div.nickName {
                 font-size: 24rpx;
+                width: 100rpx;
+                height: 32rpx;
                 color: #666;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
               }
             }
           }

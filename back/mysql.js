@@ -53,7 +53,7 @@ let allServices = {
         return allServices.query(_sql, obj)
     },
     getGroupInfo:(obj) => {
-        let _sql = "select open_id,nick_name,image,captain,groupgoods_desc,groupgoods_originalprice,groupgoods_groupbuyprice,groupgoods_url from groupbuyactivity,user,groupgoods where groupbuyactivity.open_id = user.open_id and groupbuyactivity.goods_id = groupgoods.groupgoods_id and groupbuyactivity.act_no ="+obj
+        let _sql = "select groupbuyactivity.open_id,nick_name,image,captain,groupgoods_desc,groupgoods_originalprice,groupgoods_groupbuyprice,groupgoods_url from groupbuyactivity,user,groupgoods where groupbuyactivity.open_id = user.open_id and groupbuyactivity.goods_id = groupgoods.groupgoods_id and groupbuyactivity.act_no ="+obj
         return allServices.query(_sql, obj)
 
     }
