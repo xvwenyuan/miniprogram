@@ -69,8 +69,7 @@ export default {
       name: "",
       mask: false,
       groupBuyAct: {},
-      captain: 0,
-      actId:0
+      actId: 0
     };
   },
   methods: {
@@ -95,12 +94,14 @@ export default {
       this.mask = false;
     },
     async comfirmPay() {
-      this.groupBuyAct.date = this.getTimeNow();
-      let activity = this.groupBuyAct;
-      console.log(this.groupBuyAct);
-      await this.$http.post("/activity", {
-        activity
-      });
+      if (this.group) {
+        this.groupBuyAct.date = this.getTimeNow();
+        let activity = this.groupBuyAct;
+        await this.$http.post("/activity", {
+          activity
+        });
+      }
+
       wx.showToast({
         title: "正在支付",
         icon: "loading",
@@ -111,7 +112,10 @@ export default {
         if (this.group) {
           wx.reLaunch({
             url:
-              "../paysuccess/main?totalPrice=" + this.totalPrice + "&group=true&actId=" + this.actId
+              "../paysuccess/main?totalPrice=" +
+              this.totalPrice +
+              "&group=true&actId=" +
+              this.actId
           });
         } else {
           wx.reLaunch({
@@ -223,18 +227,17 @@ export default {
       computedData.push(ele);
     } else if (payGoodsData[0].type === 4) {
       this.group = true;
-      this.captain = 1;
       payGoodsData.shift();
-      totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 1000;
+      totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 100;
       payGoodsData[0].num = 1;
       totalNum = payGoodsData[0].num;
       let ele = {
         goods_id: payGoodsData[0].groupgoods_id,
         goods_name: payGoodsData[0].groupgoods_name,
         goods_num: payGoodsData[0].num,
-        goods_price: payGoodsData[0].groupgoods_groupbuyprice / 1000,
+        goods_price: payGoodsData[0].groupgoods_groupbuyprice / 100,
         goods_url: payGoodsData[0].groupgoods_url,
-        goods_dec: payGoodsData[0].groupgoods_desc
+        goods_desc: payGoodsData[0].groupgoods_desc
       };
       computedData.push(ele);
       this.actId = actId;
@@ -242,7 +245,30 @@ export default {
         actNo: actId,
         openId: openId,
         goodsId: payGoodsData[0].groupgoods_id,
-        captain: this.captain
+        captain: 1
+      };
+    } else if (payGoodsData[0].type === 5) {
+      this.group = true;
+      this.captain = 0;
+      payGoodsData.shift();
+      totalPrice = payGoodsData[0].goods_price / 100;
+      totalNum = payGoodsData[0].num;
+      console.log(payGoodsData)
+      let ele = {
+        goods_id: payGoodsData[0].goods_id,
+        goods_name: payGoodsData[0].goods_name,
+        goods_num: payGoodsData[0].num,
+        goods_price: payGoodsData[0].goods_price / 100,
+        goods_url: payGoodsData[0].goods_url,
+        goods_desc: payGoodsData[0].goods_desc
+      };
+      console.log(ele)
+      computedData.push(ele);
+      this.groupBuyAct = {
+        actNo: payGoodsData[0].actId,
+        openId: payGoodsData[0].openId,
+        goodsId: payGoodsData[0].groupgoods_id,
+        captain: 0
       };
     }
     this.totalNum = totalNum;

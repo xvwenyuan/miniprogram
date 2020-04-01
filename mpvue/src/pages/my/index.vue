@@ -74,9 +74,8 @@ export default {
         userInfo.openId = this.openId;
         this.userInfo = userInfo;
         wx.setStorageSync("userInfo", userInfo);
-        // this.$http.get(`/user?openId=${userInfo.openId}&nickName=${userInfo.nickname}&gender=${userInfo.gender}&city=${userInfo.city}`);
         this.$http.post("/user", {
-            userInfo:userInfo.openId,
+            openId:userInfo.openId,
             nickName:userInfo.nickName,
             image:userInfo.avatarUrl,
             gender:userInfo.gender,
@@ -84,6 +83,7 @@ export default {
             province:userInfo.province
         });
       }
+      
     }
   },
   mounted() {

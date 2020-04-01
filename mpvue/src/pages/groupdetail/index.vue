@@ -116,10 +116,10 @@ export default {
   },
   computed: {
     originalPrice() {
-      return (this.goodsData.groupgoods_originalprice / 1000).toFixed(2);
+      return (this.goodsData.groupgoods_originalprice / 100).toFixed(2);
     },
     groupPrice() {
-      return (this.goodsData.groupgoods_groupbuyprice / 1000).toFixed(2);
+      return (this.goodsData.groupgoods_groupbuyprice / 100).toFixed(2);
     }
   },
   onShareAppMessage() {

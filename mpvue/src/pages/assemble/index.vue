@@ -30,8 +30,9 @@
               <div class="caption">团长</div>
               <div class="nickName">{{captainArray.nick_name}}</div>
             </div>
-            <div class="user2">
-              <div class="invite">?</div>
+            <div class="user2" v-for="item in personArray" :key="item">
+              <image :src="memberArray[item].image" v-if="memberArray[item]" />
+              <div class="invite" v-else>?</div>
               <div class="nickName">待邀请</div>
             </div>
           </div>
@@ -39,7 +40,17 @@
         </div>
       </div>
       <button class="inviteFriend" open-type="share" v-if="isMember">邀请好友</button>
-      <button class="payGroup" v-else>支付￥18.88元参与拼团</button>
+      <button
+        class="payGroup"
+        v-else
+        open-type="getUserInfo"
+        @getuserinfo="handleGetUserInfo"
+      >支付￥{{groupPrice}}元参与拼团</button>
+      <!-- <button
+        class="payGroup"
+        open-type="getUserInfo"
+        @getuserinfo="handleGetUserInfo"
+      >支付￥{{groupPrice}}元参与拼团</button>-->
     </div>
     <div class="process">
       <div class="content">
@@ -75,42 +86,87 @@ export default {
   data() {
     return {
       person: 0,
+      personArray: [],
       time: 0,
       actId: 0,
       info: [],
       myOpenId: "",
       captainArray: [],
       memberArray: [],
-      isMember:false,
-      memberNum:0
+      isMember: false,
+      memberNum: 0
     };
   },
-  computed:{
-    oriPrice(){
-      return (this.captainArray.groupgoods_originalprice/100).toFixed(2)
+  methods: {
+    handleGetUserInfo(res) {
+      if (res.mp.detail.userInfo) {
+        let userInfo = res.mp.detail.userInfo;
+        userInfo.openId = this.myOpenId;
+        wx.setStorageSync("userInfo", userInfo);
+        this.$http.post("/user", {
+          openId: userInfo.openId,
+          nickName: userInfo.nickName,
+          image: userInfo.avatarUrl,
+          gender: userInfo.gender,
+          city: userInfo.city,
+          province: userInfo.province
+        });
+      }
+      let goodsPayData = [
+        { type: 5 },
+        {
+          openId: this.myOpenId,
+          actId: this.captainArray.act_no,
+          goods_id: this.captainArray.groupgoods_id,
+          num: 1,
+          goods_name: this.captainArray.groupgoods_desc,
+          goods_price: this.captainArray.groupgoods_groupbuyprice,
+          goods_url: this.captainArray.groupgoods_url,
+          goods_desc: this.captainArray.groupgoods_desc
+        }
+      ];
+      wx.navigateTo({
+        url: "../pay/main?payGoods=" + JSON.stringify(goodsPayData)
+      });
+    }
+  },
+  computed: {
+    oriPrice() {
+      return (this.captainArray.groupgoods_originalprice / 100).toFixed(2);
     },
-    groupPrice(){
-      return (this.captainArray.groupgoods_groupbuyprice/100).toFixed(2)
+    groupPrice() {
+      return (this.captainArray.groupgoods_groupbuyprice / 100).toFixed(2);
     },
-    needPerson(){ 
-      return this.person-this.memberNum
+    needPerson() {
+      return this.person - this.memberNum;
     }
   },
   onShareAppMessage() {
     return {
-      title: "好友邀请快来拼团",
-      path: "/pages/assemble/main"
+      title: this.captainArray.nick_name + "邀请快来拼团!",
+      path: "/pages/assemble/main?actId=" + this.captainArray.act_no
     };
   },
-  async onShow() {
-    this.myOpenId = wx.getStorageSync("userInfo").openId || "";
-    console.log(this.myOpenId);
+  async mounted() {
+    this.memberArray = [];
+    this.personArray = {};
+    this.isMember = false;
     this.actId = this.$mp.query.actId;
-    console.log(this.actId);
+    if (!this.myOpenId) {
+      wx.login({
+        success: result => {
+          this.$http.get(`/login?jsCode=${result.code}`).then(res => {
+            this.myOpenId = res.data;
+          });
+        }
+      });
+    }
+    this.myOpenId = wx.getStorageSync("userInfo").openId || "";
     this.$http.get("/groupset").then(res => {
       this.person = res.data[0].person;
       this.time = res.data[0].time;
     });
+
     await this.$http
       .post("/groupInfo", {
         actNo: this.actId
@@ -121,21 +177,26 @@ export default {
           this.info.push(res.data[prop]);
         }
         let obj = {};
-        this.info.map(item => {//去重
+        this.info.map(item => {
+          //去重
           obj[item.open_id] = item;
         });
         this.info = Object.values(obj);
       });
-    this.memberNum = this.info.length;//团人数
-    this.captainArray = this.info.filter(v => v.captain)[0];//团长数组
-    this.memberArray = this.info.filter(v => !v.captain);//团员数组
-    console.log(this.myOpenId)
-    this.info.forEach( v => {
-      if( v.open_id === this.myOpenId){
+    console.log(this.info);
+    this.memberNum = this.info.length; //团人数
+    this.captainArray = this.info.filter(v => v.captain)[0]; //团长数组
+    this.memberArray = this.info.filter(v => !v.captain); //团员数组
+    this.info.forEach(v => {
+      if (v.open_id === this.myOpenId) {
         this.isMember = true;
       }
-    })
-    console.log(this.isMembe)    
+    });
+    for (let i = 0; i < this.person - 1; i++) {
+      this.personArray.push(i);
+    }
+    console.log(this.personArray,this.memberArray)
+    console.log(111)
   }
 };
 </script>
@@ -279,6 +340,11 @@ page {
                 font-size: 40rpx;
                 box-sizing: border-box;
               }
+              image {
+                height: 100rpx;
+                width: 100rpx;
+                border-radius: 50%;
+              }
               div.nickName {
                 font-size: 24rpx;
                 width: 100rpx;
@@ -313,7 +379,7 @@ page {
         background-color: #f00;
         font-weight: bold;
         border-radius: 10rpx;
-        margin: 100rpx 0;
+        margin: 100rpx auto;
       }
     }
     div.process {

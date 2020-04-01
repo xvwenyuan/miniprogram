@@ -4,7 +4,7 @@
       <li v-for="item in goodsList" :key="item.groupgoods_id" @click="goGroupDetail(item)">
         <img :src="item.groupgoods_url" alt="">
         <p class="desc">{{item.groupgoods_desc}}</p>
-        <p class="price">拼团价格:￥<span class="groupPrice">{{item.groupgoods_groupbuyprice/1000}}</span><span class="originalPrice">原价:￥{{item.groupgoods_originalprice/1000}}</span></p>
+        <p class="price">拼团价格:￥<span class="groupPrice">{{item.groupgoods_groupbuyprice/100}}</span><span class="originalPrice">原价:￥{{item.groupgoods_originalprice/100}}</span></p>
         <p class="sale">已拼{{item.groupgoods_sale}}件</p>
       </li>
     </ul>
