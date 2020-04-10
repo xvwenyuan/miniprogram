@@ -34,7 +34,10 @@
         <button>立即参团</button>
       </div>
     </div>
-    <div class="address">送至江西南昌蛟桥镇 ></div>
+    <div class="address" @click="toAddress">
+      送至 {{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}}
+      <span class="open">></span> 
+    </div>
 
     <div class="bottomBtn">
       <div class="home" @click="toHome">
@@ -59,7 +62,9 @@
 export default {
   data() {
     return {
-      goodsData: {}
+      goodsData: {},
+      region: [],
+      detailAddress: ""
     };
   },
   methods: {
@@ -109,6 +114,11 @@ export default {
           });
         }, 2000);
       }
+    },
+    toAddress() {
+      wx.navigateTo({
+        url: "../address/main"
+      });
     }
   },
   mounted() {
@@ -127,6 +137,10 @@ export default {
       title: this.goodsData.groupgoods_name,
       path: "/pages/groupdetail/main"
     };
+  },
+  onShow() {
+    this.region = wx.getStorageSync("address") || [];
+    this.detailAddress = wx.getStorageSync("detailAddress") || "";
   }
 };
 </script>
@@ -253,10 +267,19 @@ div.groupDetail {
     }
   }
   .address {
-    margin: 10rpx 0;
-    height: 40rpx;
+    margin: 10rpx 0 0 400rpx 0;
+    height: 500rpx;
     width: 100%;
     background-color: #fff;
+    padding: 4rpx;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    span.open {
+      position: absolute;
+      right: 20rpx;
+    }
   }
   .bottomBtn {
     position: fixed;

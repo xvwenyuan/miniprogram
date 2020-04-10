@@ -4,7 +4,7 @@
     <div class="successText">支付成功</div>
     <div class="successAc">可期团购平台商户</div>
     <div class="payMoney">￥{{totalPrice}}</div>
-    <div class="return" @click="returnHome" v-if="!group">返回商家</div>
+    <div class="return" @click="returnHome">返回商家</div>
     <!-- <div class="invite" @click="returnGroup" v-else>邀请好友拼团</div> -->
   </div>
 </template>
@@ -31,22 +31,22 @@ export default {
   },
   onShow() {
     this.totalPrice = JSON.parse(this.$mp.query.totalPrice);
-    let flag = this.$mp.query.group;
-    let actId = this.$mp.query.actId;
-    if (flag === "true") {
-      this.group = true;
-      wx.showToast({
-        title: "正在前往拼团页面",
-        icon: "none",
-        image: "",
-        mask: true
-      });
-      wx.reLaunch({
-        url: "../assemble/main?actId="+actId
-      });
-    } else {
-      this.group = false;
-    }
+    // let flag = this.$mp.query.group;
+    // let actId = this.$mp.query.actId;
+    // if (flag === "true") {
+    //   this.group = true;
+    //   wx.showToast({
+    //     title: "正在前往拼团页面",
+    //     icon: "none",
+    //     image: "",
+    //     mask: true
+    //   });
+    //   wx.reLaunch({
+    //     url: "../assemble/main?actId="+actId
+    //   });
+    // } else {
+    //   this.group = false;
+    // }
   }
 };
 </script>

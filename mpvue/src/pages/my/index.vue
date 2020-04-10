@@ -34,7 +34,7 @@
       </ul>
     </div>
     <ul class="two">
-      <li>
+      <li @click="toMyGroup">
         <img src="/static/my/groupbuy.png" alt />
         <p>我的团购</p>
       </li>
@@ -55,7 +55,10 @@
         <p>退款售后</p>
       </li>
     </ul>
-    <div class="address">地址：</div>
+    <div
+      class="address"
+      @click="toAddress"
+    >地址：{{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}}</div>
   </div>
 </template>
 
@@ -64,7 +67,9 @@ export default {
   data() {
     return {
       userInfo: {},
-      openId: ""
+      openId: "",
+      region: [],
+      detailAddress: ""
     };
   },
   methods: {
@@ -75,15 +80,24 @@ export default {
         this.userInfo = userInfo;
         wx.setStorageSync("userInfo", userInfo);
         this.$http.post("/user", {
-            openId:userInfo.openId,
-            nickName:userInfo.nickName,
-            image:userInfo.avatarUrl,
-            gender:userInfo.gender,
-            city:userInfo.city,
-            province:userInfo.province
+          openId: userInfo.openId,
+          nickName: userInfo.nickName,
+          image: userInfo.avatarUrl,
+          gender: userInfo.gender,
+          city: userInfo.city,
+          province: userInfo.province
         });
       }
-      
+    },
+    toAddress() {
+      wx.navigateTo({
+        url: "../address/main"
+      });
+    },
+    toMyGroup(){
+      wx.navigateTo({
+        url: '../mygroup/main'
+      });
     }
   },
   mounted() {
@@ -97,6 +111,7 @@ export default {
       });
     }
     this.userInfo = wx.getStorageSync("userInfo") || {};
+
     // wx.getUserInfo({
     //   success: res => {
     //     //更新数据状态
@@ -109,6 +124,10 @@ export default {
     //     console.log("获取失败");
     //   }
     // });
+  },
+  onShow() {
+    this.region = wx.getStorageSync("address") || [];
+    this.detailAddress = wx.getStorageSync("detailAddress") || "";
   }
 };
 </script>
@@ -203,6 +222,9 @@ export default {
     width: 680rpx;
     padding: 20rpx;
     font-size: 26rpx;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 </style>

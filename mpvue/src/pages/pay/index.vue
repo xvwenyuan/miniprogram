@@ -97,6 +97,7 @@ export default {
       if (this.group) {
         this.groupBuyAct.date = this.getTimeNow();
         let activity = this.groupBuyAct;
+        console.log("activi", activity);
         await this.$http.post("/activity", {
           activity
         });
@@ -108,54 +109,76 @@ export default {
         image: "",
         duration: 1800
       });
-      setTimeout(() => {
-        if (this.group) {
-          wx.reLaunch({
-            url:
-              "../paysuccess/main?totalPrice=" +
-              this.totalPrice +
-              "&group=true&actId=" +
-              this.actId
+      if (this.group) {
+        setTimeout(() => {
+          wx.showToast({
+            title: "支付完成前往拼团页面",
+            icon: "none",
+            image: "",
+            duration: 2000
           });
-        } else {
+        }, 2000);
+        setTimeout(() => {
           wx.reLaunch({
-            url:
-              "../paysuccess/main?totalPrice=" +
-              this.totalPrice +
-              "&group=false"
+            url: "../assemble/main?actId=" + this.groupBuyAct.actNo,
+            success: result => {},
+            fail: () => {},
+            complete: () => {}
           });
-        }
-      }, 2000);
+        }, 3000);
+      } else {
+        wx.reLaunch({
+          url: "../paysuccess/main?totalPrice="+this.totalPrice,
+          success: result => {},
+          fail: () => {},
+          complete: () => {}
+        });
+      }
+      // setTimeout(() => {
+      //   if (this.group) {
+      //     wx.reLaunch({
+      //       url:
+      //         "../paysuccess/main?totalPrice=" +
+      //         this.totalPrice +
+      //         "&group=true&actId=" +
+      //         this.actId
+      //     });
+      //   } else {
+      //     wx.reLaunch({
+      //       url:
+      //         "../paysuccess/main"
+      //     });
+      //   }
+      // }, 2000);
     },
     getTimeNow() {
-      let now = new Date();
-      let year = now.getFullYear(); //得到年份
-      let month = now.getMonth(); //得到月份
-      var date = now.getDate(); //得到日期
-      let hour = now.getHours(); //得到小时
-      let minu = now.getMinutes(); //得到分钟
-      let sec = now.getSeconds(); //得到秒
-      let time = "";
-      month = month + 1;
-      if (month < 10) month = "0" + month;
-      if (date < 10) date = "0" + date;
-      if (hour < 10) hour = "0" + hour;
-      if (minu < 10) minu = "0" + minu;
-      if (sec < 10) sec = "0" + sec;
-      time =
-        year +
-        "年" +
-        month +
-        "月" +
-        date +
-        "日" +
-        " " +
-        hour +
-        ":" +
-        minu +
-        ":" +
-        sec;
-      return time;
+      let now = +new Date();
+      // let year = now.getFullYear(); //得到年份
+      // let month = now.getMonth(); //得到月份
+      // var date = now.getDate(); //得到日期
+      // let hour = now.getHours(); //得到小时
+      // let minu = now.getMinutes(); //得到分钟
+      // let sec = now.getSeconds(); //得到秒
+      // let time = "";
+      // month = month + 1;
+      // if (month < 10) month = "0" + month;
+      // if (date < 10) date = "0" + date;
+      // if (hour < 10) hour = "0" + hour;
+      // if (minu < 10) minu = "0" + minu;
+      // if (sec < 10) sec = "0" + sec;
+      // time =
+      //   year +
+      //   "/" +
+      //   month +
+      //   "/" +
+      //   date +
+      //   " " +
+      //   hour +
+      //   ":" +
+      //   minu +
+      //   ":" +
+      //   sec;
+      return now;
     }
   },
   onShow() {
@@ -163,7 +186,6 @@ export default {
     let totalNum = 0;
     let totalPrice = 0;
     let payGoodsData = JSON.parse(this.$mp.query.payGoods);
-    console.log();
     let computedData = [];
     //ordeNo订单号,openId:用户,goodsId:商品ID,goodsNum:商品数量,goodsPrice:商品价格,
     //date:下单时间,orderStatus:订单状态1待收货,2待付款,goodsType:商品类型,0普通商品,1团购商品
@@ -253,7 +275,6 @@ export default {
       payGoodsData.shift();
       totalPrice = payGoodsData[0].goods_price / 100;
       totalNum = payGoodsData[0].num;
-      console.log(payGoodsData)
       let ele = {
         goods_id: payGoodsData[0].goods_id,
         goods_name: payGoodsData[0].goods_name,
@@ -262,12 +283,11 @@ export default {
         goods_url: payGoodsData[0].goods_url,
         goods_desc: payGoodsData[0].goods_desc
       };
-      console.log(ele)
       computedData.push(ele);
       this.groupBuyAct = {
         actNo: payGoodsData[0].actId,
         openId: payGoodsData[0].openId,
-        goodsId: payGoodsData[0].groupgoods_id,
+        goodsId: payGoodsData[0].goods_id,
         captain: 0
       };
     }

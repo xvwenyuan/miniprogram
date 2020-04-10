@@ -10,7 +10,8 @@
     "pages/pay/main",
     "pages/order/main",
     "pages/paysuccess/main",
-    "pages/assemble/main"
+    "pages/assemble/main",
+    "pages/mygroup/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

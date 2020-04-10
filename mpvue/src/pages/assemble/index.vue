@@ -21,7 +21,7 @@
           <span class="text2">{{needPerson}}</span>
           <span class="text3">人</span>
           <span class="text4">距结束</span>
-          <span class="text5">08:28:16</span>
+          <count-Down :endDate="endTime"></count-Down>
         </div>
         <div class="radius">
           <div class="userGroup">
@@ -33,7 +33,8 @@
             <div class="user2" v-for="item in personArray" :key="item">
               <image :src="memberArray[item].image" v-if="memberArray[item]" />
               <div class="invite" v-else>?</div>
-              <div class="nickName">待邀请</div>
+              <div class="nickName" v-if="memberArray[item]">{{memberArray[item].nick_name}}</div>
+              <div class="nickName" v-else>待邀请</div>
             </div>
           </div>
           <div class="userGroup"></div>
@@ -42,15 +43,11 @@
       <button class="inviteFriend" open-type="share" v-if="isMember">邀请好友</button>
       <button
         class="payGroup"
-        v-else
+        v-if="isVisit"
         open-type="getUserInfo"
         @getuserinfo="handleGetUserInfo"
       >支付￥{{groupPrice}}元参与拼团</button>
-      <!-- <button
-        class="payGroup"
-        open-type="getUserInfo"
-        @getuserinfo="handleGetUserInfo"
-      >支付￥{{groupPrice}}元参与拼团</button>-->
+      <div class="inviteFriend" v-if="isSuccess">拼团成功</div>
     </div>
     <div class="process">
       <div class="content">
@@ -82,6 +79,8 @@
 </template>
 
 <script>
+import countDown from "../../components/countDown";
+import moment from "moment"
 export default {
   data() {
     return {
@@ -94,8 +93,14 @@ export default {
       captainArray: [],
       memberArray: [],
       isMember: false,
-      memberNum: 0
+      isVisit: true,
+      memberNum: 0,
+      isSuccess: false,
+      endTime:0
     };
+  },
+  components: {
+    countDown
   },
   methods: {
     handleGetUserInfo(res) {
@@ -128,6 +133,37 @@ export default {
       wx.navigateTo({
         url: "../pay/main?payGoods=" + JSON.stringify(goodsPayData)
       });
+    },
+    async getSet() {
+      try {
+        const res = await this.$http.get("/groupset");
+        this.person = res.data[0].person;
+        this.time = res.data[0].time;
+        this.personArray = [];
+        for (let i = 0; i < this.person - 1; i++) {
+          this.personArray.push(i);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async getInfo() {
+      this.actId = this.$mp.query.actId;
+      this.info = [];
+      try {
+        const res = await this.$http.post("/groupinfo", { actNo: this.actId });
+        for (let prop in res.data) {
+          this.info.push(res.data[prop]);
+        }
+        let obj = {};
+        this.info.map(item => {
+          //去重
+          obj[item.open_id] = item;
+        });
+        this.info = Object.values(obj);
+      } catch (err) {
+        console.log(err);
+      }
     }
   },
   computed: {
@@ -147,11 +183,16 @@ export default {
       path: "/pages/assemble/main?actId=" + this.captainArray.act_no
     };
   },
-  async mounted() {
-    this.memberArray = [];
-    this.personArray = {};
+  onPullDownRefresh() {
+    wx.redirectTo({
+      url: "../assemble/main?actId=" + this.captainArray.act_no
+    });
+    wx.stopPullDownRefresh();
+  },
+  async onShow() {
     this.isMember = false;
-    this.actId = this.$mp.query.actId;
+    this.isVisit = true;
+    this.isSuccess = false;
     if (!this.myOpenId) {
       wx.login({
         success: result => {
@@ -162,41 +203,21 @@ export default {
       });
     }
     this.myOpenId = wx.getStorageSync("userInfo").openId || "";
-    this.$http.get("/groupset").then(res => {
-      this.person = res.data[0].person;
-      this.time = res.data[0].time;
-    });
-
-    await this.$http
-      .post("/groupInfo", {
-        actNo: this.actId
-      })
-      .then(res => {
-        this.info = res.data;
-        for (let prop in res.data) {
-          this.info.push(res.data[prop]);
-        }
-        let obj = {};
-        this.info.map(item => {
-          //去重
-          obj[item.open_id] = item;
-        });
-        this.info = Object.values(obj);
-      });
-    console.log(this.info);
+    this.getSet();
+    await this.getInfo();
+    console.log("info", this.info);
     this.memberNum = this.info.length; //团人数
     this.captainArray = this.info.filter(v => v.captain)[0]; //团长数组
     this.memberArray = this.info.filter(v => !v.captain); //团员数组
-    this.info.forEach(v => {
-      if (v.open_id === this.myOpenId) {
-        this.isMember = true;
-      }
-    });
-    for (let i = 0; i < this.person - 1; i++) {
-      this.personArray.push(i);
+    this.endTime = parseInt(this.captainArray.date)+parseInt(this.time*60*60*1000);
+    this.isMember = this.info.some(v => v.open_id === this.myOpenId);
+    this.isVisit = !this.isMember;
+    console.log(this.memberNum, this.person);
+    if (this.memberNum == this.person) {
+      this.isSuccess = true;
+      this.isMember = false;
+      this.isVisit = false;
     }
-    console.log(this.personArray,this.memberArray)
-    console.log(111)
   }
 };
 </script>
@@ -281,9 +302,6 @@ page {
           .text4 {
             margin-right: 20rpx;
           }
-          .text5 {
-            color: #f00;
-          }
         }
         div.radius {
           div.userGroup {
@@ -311,7 +329,7 @@ page {
                 position: absolute;
                 font-size: 24rpx;
                 text-align: center;
-                top: 68rpx;
+                top: 70rpx;
               }
               div.nickName {
                 font-size: 24rpx;
@@ -353,6 +371,7 @@ page {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                text-align: center;
               }
             }
           }
@@ -371,6 +390,17 @@ page {
       }
 
       button.payGroup {
+        color: #fff;
+        width: 600rpx;
+        text-align: center;
+        line-height: 100rpx;
+        height: 100rpx;
+        background-color: #f00;
+        font-weight: bold;
+        border-radius: 10rpx;
+        margin: 100rpx auto;
+      }
+      div.inviteFriend {
         color: #fff;
         width: 600rpx;
         text-align: center;

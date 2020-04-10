@@ -17,14 +17,13 @@
         <button open-type="share" plain="true" type="primary" style="width:50rpx height:50rpx">
           <image src="/static/groupdetail/share.png" />
         </button>
-
         <div>分享</div>
       </div>
     </div>
     <div
       class="address"
       @click="goEditAddress"
-    >送至 {{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}} ></div>
+    >送至 {{region[0]}}{{region[1]}}{{region[2]}} {{detailAddress}} <span class="open">></span></div>
     <div class="buy">
       <div class="left" @click="toHome">
         <img src="/static/goodsdetail/home.png" />
@@ -213,8 +212,10 @@ export default {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    span {
-      float: right;
+    position: relative;
+    span.open {
+      position: absolute;
+      right: 20rpx;
     }
   }
   .buy {
