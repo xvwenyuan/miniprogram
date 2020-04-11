@@ -45,7 +45,11 @@ let allServices = {
         return allServices.query(_sql, obj)
     },
     addAcivity:(obj) => {//团购活动数据
-        let _sql = "insert into groupbuyactivity set act_no=?,open_id=?,goods_id=?,captain=?,date=?;"
+        let _sql = "insert into groupbuyactivity set act_no=?,open_id=?,goods_id=?,captain=?,date=?,issuccess=?;"
+        return allServices.query(_sql, obj)
+    },
+   success:(obj) => {//拼团成功
+        let _sql = "update groupbuyactivity set issuccess=1 where captain=1 and act_no="+obj
         return allServices.query(_sql, obj)
     },
     getGroupSet:(obj) =>{//获取团购设置
@@ -57,9 +61,13 @@ let allServices = {
         return allServices.query(_sql, obj)
 
     },
-    getJoinGroup:(obj) => {
+    getJoinGroup:(obj) => {//已参团
         console.log(obj[0],obj[1])
         let _sql = `select act_no,goods_id,groupgoods_desc,groupgoods_groupbuyprice,groupgoods_url from groupbuyactivity,groupgoods where groupbuyactivity.goods_id = groupgoods.groupgoods_id and groupbuyactivity.captain=${obj[0]} and groupbuyactivity.open_id = '${obj[1]}'`
+        return allServices.query(_sql, obj)
+    },
+    show:(obj) => {//其他网友的团购信息
+        let _sql = "select act_no,goods_id,nick_name,image from groupbuyactivity,user where user.open_id=groupbuyactivity.open_id and captain=1 and issuccess=0 and goods_id="+obj
         return allServices.query(_sql, obj)
     }
 }

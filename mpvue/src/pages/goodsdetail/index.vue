@@ -105,10 +105,10 @@ export default {
         url: "../address/main"
       });
     },
-    // handleCollect(){
-    //   let collect = wx.getStorageSync("collect")||[];
+    handleCollect(){
+      this.isCollect = !this.isCollect
 
-    // },
+    },
     toPayHandle() {
       if (wx.getStorageSync("userInfo")) {
         let goodsData = this.goodsData;
@@ -140,8 +140,6 @@ export default {
   onShow() {
     this.region = wx.getStorageSync("address") || [];
     this.detailAddress = wx.getStorageSync("detailAddress") || "";
-    // let collect = wx.getStorageSync("collect")||[];
-    // collect.findIndex()
   }
 };
 </script>

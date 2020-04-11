@@ -168,10 +168,10 @@ export default {
   },
   computed: {
     oriPrice() {
-      return (this.captainArray.groupgoods_originalprice / 100).toFixed(2);
+      return (this.captainArray.groupgoods_originalprice / 1000).toFixed(2);
     },
     groupPrice() {
-      return (this.captainArray.groupgoods_groupbuyprice / 100).toFixed(2);
+      return (this.captainArray.groupgoods_groupbuyprice / 1000).toFixed(2);
     },
     needPerson() {
       return this.person - this.memberNum;
@@ -217,6 +217,9 @@ export default {
       this.isSuccess = true;
       this.isMember = false;
       this.isVisit = false;
+      this.$http.post('/success',{
+        actId:this.captainArray.act_no
+      })
     }
   }
 };

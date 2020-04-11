@@ -4,7 +4,7 @@ const groupData = require('./groupData');
 // 注意require('koa-router')返回的是函数:
 const router = require('koa-router')();
 const bodyParser = require('koa-bodyparser');
-const { findUserData, addUserData, addGroupGoods, addUser, addAcivity, getGroupSet,getGroupInfo, getJoinGroup } = require('./mysql');
+const { findUserData, addUserData, addGroupGoods, addUser, addAcivity, success, getGroupSet,getGroupInfo, getJoinGroup, show} = require('./mysql');
 const axios = require('axios');
 var cors = require('koa2-cors');
 const app = new Koa();//创建一个koa对象
@@ -73,6 +73,26 @@ router.get('/groupset', async (ctx, next) => {//发送团购设置,人数、时�
         ctx.response.body = setData;
     } catch (error) {
         console.log('error')
+    }
+})
+router.post('/success', async (ctx, next) => {//拼团成功.
+    let actNo = ctx.request.body.actId
+    try {
+        success(actNo);
+        console.log(actNo)
+        ctx.response.body = ''
+    } catch (error) {
+        console.log('error')
+    }
+})
+router.post('/show', async (ctx, next) => {//其他网友拼团展示
+    try {
+    let id = ctx.request.body.goodsId
+    let data = await show(id)
+    console.log(data)
+    ctx.response.body = data
+    } catch (error) {
+        
     }
 })
 router.post('/groupInfo',async (ctx,next) => {//发送团购数据信息

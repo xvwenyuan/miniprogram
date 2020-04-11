@@ -17,7 +17,7 @@
         <div class="goodsInfo">
           <div class="desc">{{item.groupgoods_desc}}</div>
           <div class="numTool">
-            <div class="price">￥{{item.groupgoods_groupbuyprice/100+'0'}}</div>
+            <div class="price">￥{{item.groupgoods_groupbuyprice/1000}}</div>
             <div class="goodsNum">X 1</div>
           </div>
         </div>
@@ -34,7 +34,7 @@
         <div class="goodsInfo">
           <div class="desc">{{item.groupgoods_desc}}</div>
           <div class="numTool">
-            <div class="price">￥{{(item.groupgoods_groupbuyprice)/100+'0'}}</div>
+            <div class="price">￥{{(item.groupgoods_groupbuyprice)/1000}}</div>
             <div class="goodsNum">X 1</div>
           </div>
         </div>

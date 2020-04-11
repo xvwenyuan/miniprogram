@@ -97,6 +97,7 @@ export default {
       if (this.group) {
         this.groupBuyAct.date = this.getTimeNow();
         let activity = this.groupBuyAct;
+        activity.issuccess = 0;
         console.log("activi", activity);
         await this.$http.post("/activity", {
           activity
@@ -128,56 +129,15 @@ export default {
         }, 3000);
       } else {
         wx.reLaunch({
-          url: "../paysuccess/main?totalPrice="+this.totalPrice,
+          url: "../paysuccess/main?totalPrice=" + this.totalPrice,
           success: result => {},
           fail: () => {},
           complete: () => {}
         });
       }
-      // setTimeout(() => {
-      //   if (this.group) {
-      //     wx.reLaunch({
-      //       url:
-      //         "../paysuccess/main?totalPrice=" +
-      //         this.totalPrice +
-      //         "&group=true&actId=" +
-      //         this.actId
-      //     });
-      //   } else {
-      //     wx.reLaunch({
-      //       url:
-      //         "../paysuccess/main"
-      //     });
-      //   }
-      // }, 2000);
     },
     getTimeNow() {
       let now = +new Date();
-      // let year = now.getFullYear(); //得到年份
-      // let month = now.getMonth(); //得到月份
-      // var date = now.getDate(); //得到日期
-      // let hour = now.getHours(); //得到小时
-      // let minu = now.getMinutes(); //得到分钟
-      // let sec = now.getSeconds(); //得到秒
-      // let time = "";
-      // month = month + 1;
-      // if (month < 10) month = "0" + month;
-      // if (date < 10) date = "0" + date;
-      // if (hour < 10) hour = "0" + hour;
-      // if (minu < 10) minu = "0" + minu;
-      // if (sec < 10) sec = "0" + sec;
-      // time =
-      //   year +
-      //   "/" +
-      //   month +
-      //   "/" +
-      //   date +
-      //   " " +
-      //   hour +
-      //   ":" +
-      //   minu +
-      //   ":" +
-      //   sec;
       return now;
     }
   },
@@ -250,14 +210,14 @@ export default {
     } else if (payGoodsData[0].type === 4) {
       this.group = true;
       payGoodsData.shift();
-      totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 100;
+      totalPrice = payGoodsData[0].groupgoods_groupbuyprice / 1000;
       payGoodsData[0].num = 1;
       totalNum = payGoodsData[0].num;
       let ele = {
         goods_id: payGoodsData[0].groupgoods_id,
         goods_name: payGoodsData[0].groupgoods_name,
         goods_num: payGoodsData[0].num,
-        goods_price: payGoodsData[0].groupgoods_groupbuyprice / 100,
+        goods_price: payGoodsData[0].groupgoods_groupbuyprice / 1000,
         goods_url: payGoodsData[0].groupgoods_url,
         goods_desc: payGoodsData[0].groupgoods_desc
       };
@@ -273,13 +233,13 @@ export default {
       this.group = true;
       this.captain = 0;
       payGoodsData.shift();
-      totalPrice = payGoodsData[0].goods_price / 100;
+      totalPrice = payGoodsData[0].goods_price / 1000;
       totalNum = payGoodsData[0].num;
       let ele = {
         goods_id: payGoodsData[0].goods_id,
         goods_name: payGoodsData[0].goods_name,
         goods_num: payGoodsData[0].num,
-        goods_price: payGoodsData[0].goods_price / 100,
+        goods_price: payGoodsData[0].goods_price / 1000,
         goods_url: payGoodsData[0].goods_url,
         goods_desc: payGoodsData[0].goods_desc
       };
@@ -294,7 +254,6 @@ export default {
     this.totalNum = totalNum;
     this.totalPrice = totalPrice.toFixed(2);
     this.payGoods = computedData;
-    // payGoods.push(orderNo);
 
     //地址数据
     let addressData = wx.getStorageSync("address") || [];

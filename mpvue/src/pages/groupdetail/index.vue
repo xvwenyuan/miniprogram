@@ -7,7 +7,7 @@
       <div class="headers">
         <div class="left">
           ￥{{groupPrice}}
-          <div class="peoplegroup">4人团</div>
+          <div class="peoplegroup">2人团</div>
         </div>
         <div class="right">已拼{{goodsData.groupgoods_sale}}件</div>
       </div>
@@ -16,8 +16,8 @@
     <div class="desc">
       <p class="goodsDesc">{{goodsData.groupgoods_desc}}</p>
 
-      <div class="collect">
-        <image src="/static/groupdetail/collect.png" />
+      <div class="collect" @click="handleCollect">
+        <image :src="!isCollect?'/static/goodsdetail/collect.png':'/static/goodsdetail/collect-active.png'" />
         <div>收藏</div>
       </div>
       <div class="share">
@@ -27,11 +27,16 @@
         <div>分享</div>
       </div>
     </div>
-    <div class="groupInfo">
+    <div class="groupInfo" v-if="showData.length">
       <div class="text">直接参与可快速成团</div>
       <div class="joinGroup">
-        1231231241
-        <button>立即参团</button>
+        <swiper interval="3000" autoplay vertical="true" easing-function="linear"> 
+          <swiper-item v-for="item in showData" :key="item.act_no">
+          <img :src="item.image" alt />
+          <span class="nickName">{{item.nick_name}}</span>
+          <button class="join" @click="toGroup($evevt,item.act_no)">立即参团</button>
+        </swiper-item>
+        </swiper>
       </div>
     </div>
     <div class="address" @click="toAddress">
@@ -64,7 +69,9 @@ export default {
     return {
       goodsData: {},
       region: [],
-      detailAddress: ""
+      detailAddress: "",
+      showData:[],
+      isCollect: false
     };
   },
   methods: {
@@ -119,17 +126,22 @@ export default {
       wx.navigateTo({
         url: "../address/main"
       });
+    },
+    toGroup(e, id) {
+      wx.navigateTo({
+        url: "../assemble/main?actId=" + id
+      });
+    },
+    handleCollect(){
+      this.isCollect = !this.isCollect
     }
-  },
-  mounted() {
-    this.goodsData = JSON.parse(this.$mp.query.goodsData);
   },
   computed: {
     originalPrice() {
-      return (this.goodsData.groupgoods_originalprice / 100).toFixed(2);
+      return (this.goodsData.groupgoods_originalprice / 1000).toFixed(2);
     },
     groupPrice() {
-      return (this.goodsData.groupgoods_groupbuyprice / 100).toFixed(2);
+      return (this.goodsData.groupgoods_groupbuyprice / 1000).toFixed(2);
     }
   },
   onShareAppMessage() {
@@ -139,8 +151,13 @@ export default {
     };
   },
   onShow() {
+    this.goodsData = JSON.parse(this.$mp.query.goodsData);
     this.region = wx.getStorageSync("address") || [];
     this.detailAddress = wx.getStorageSync("detailAddress") || "";
+    this.$http.post('/show',{
+      goodsId:this.goodsData.groupgoods_id
+    }).then( res => this.showData = res.data)
+    console.log(this.showData)
   }
 };
 </script>
@@ -252,23 +269,37 @@ div.groupDetail {
       color: #555;
     }
     .joinGroup {
-      height: 80rpx;
-      button {
-        margin: 15rpx 0;
-        font-size: 24rpx;
-        width: 160rpx;
-        height: 50rpx;
-        line-height: 50rpx;
+      swiper-item{
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        img{
+        width: 140rpx;
+        height:140rpx;
+        border-radius: 50%;
+      }
+      div.nickname{
+        height: 80rpx;
+        font-size: 36rpx;
+      }
+      button.join {
+        margin: 0;
+        font-size: 28rpx;
+        width: 200rpx;
+        height: 80rpx;
+        line-height: 80rpx;
         border-radius: 10rpx;
         color: #fff;
         background-color: #f30;
-        float: right;
       }
+
+      }
+      
     }
   }
   .address {
-    margin: 10rpx 0 0 400rpx 0;
-    height: 500rpx;
+    margin: 300rpx 0 0 400rpx 0;
+    height: 200rpx;
     width: 100%;
     background-color: #fff;
     padding: 4rpx;
